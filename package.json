@@ -1,0 +1,66 @@
+{
+  "author": {
+    "name": "Eugene Hauptmann",
+    "email": "eugene.hp2012@gmail.com"
+  },
+  "bin": {
+    "uuid": "./bin/uuid"
+  },
+  "bugs": {
+    "url": "https://github.com/broofa/node-uuid/issues"
+  },
+  "contributors": [
+    {
+      "email": "robert@broofa.com",
+      "name": "Robert Kieffer"
+    },
+    {
+      "name": "AJ ONeal",
+      "email": "coolaj86@gmail.com"
+    },
+    {
+      "name": "Christoph Tavan",
+      "email": "dev@tavan.de"
+    }
+  ],
+  "dependencies": {
+    "crypto-js": "^3.1.6"
+  },
+  "description": "Rigorous implementation of RFC4122 (v1 and v4) UUIDs for React Native",
+  "devDependencies": {
+    "nyc": "^2.2.0"
+  },
+  "directories": {},
+  "homepage": "https://github.com/eugenehp/react-native-uuid",
+  "installable": true,
+  "keywords": [
+    "react-native",
+    "react",
+    "iOS",
+    "Android",
+    "guid",
+    "rfc4122",
+    "uuid"
+  ],
+  "lib": ".",
+  "license": "MIT",
+  "main": "./uuid.js",
+  "maintainers": [
+    {
+      "name": "Eugene Hauptmann",
+      "email": "eugene.hp2012@gmail.com"
+    }
+  ],
+  "name": "react-native-uuid",
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eugenehp/react-native-uuid.git"
+  },
+  "scripts": {
+    "coverage": "nyc npm test && nyc report",
+    "test": "node test/test.js"
+  },
+  "url": "http://github.com/eugenehp/react-native-uuid",
+  "version": "1.4.7"
+}
