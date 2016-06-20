@@ -25,11 +25,11 @@ Install it in your browser:
 Or in node.js:
 
 ```
-npm install node-uuid
+npm install react-native-uuid
 ```
 
 ```javascript
-var uuid = require('node-uuid');
+var uuid = require('react-native-uuid');
 ```
 
 Then create some ids ...
