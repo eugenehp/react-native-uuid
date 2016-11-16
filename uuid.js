@@ -56,7 +56,7 @@
     // Moderately fast, high quality
     if ('function' === typeof require) {
       try {
-        var _rb = require('crypto-js').randomBytes;
+        var _rb = require('crypto').randomBytes;
         _nodeRNG = _rng = _rb && function() {return _rb(16);};
         _rng();
       } catch(e) {}
