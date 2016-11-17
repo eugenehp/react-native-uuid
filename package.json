@@ -23,6 +23,9 @@
       "email": "dev@tavan.de"
     }
   ],
+  "dependencies": {
+    "randombytes": "^2.0.3"
+  },
   "description": "Rigorous implementation of RFC4122 (v1 and v4) UUIDs for React Native",
   "devDependencies": {
     "nyc": "^2.2.0"
