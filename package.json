@@ -62,5 +62,5 @@
     "test": "node test/test.js"
   },
   "url": "http://github.com/eugenehp/react-native-uuid",
-  "version": "1.4.8"
+  "version": "1.4.9"
 }
