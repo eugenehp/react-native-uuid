@@ -24,7 +24,8 @@
     }
   ],
   "dependencies": {
-    "randombytes": "^2.0.3"
+    "randombytes": "^2.0.3",
+    "buffer": "^5.2.1"
   },
   "description": "Rigorous implementation of RFC4122 (v1 and v4) UUIDs for React Native",
   "devDependencies": {
