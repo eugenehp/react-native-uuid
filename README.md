@@ -1,6 +1,6 @@
-# node-uuid
+# react-native-uuid
 
-Simple, fast generation of [RFC4122](http://www.ietf.org/rfc/rfc4122.txt) UUIDS.
+Simple, fast generation of [RFC4122](http://www.ietf.org/rfc/rfc4122.txt) UUIDS for react native.
 
 Features:
 
@@ -16,13 +16,7 @@ Features:
 
 ## Getting Started
 
-Install it in your browser:
-
-```html
-<script src="uuid.js"></script>
-```
-
-Or in node.js:
+Install the library:
 
 ```
 npm install react-native-uuid
@@ -201,54 +195,6 @@ options:
 
 ## Testing
 
-In node.js
-
 ```
 npm test
 ```
-
-In Browser
-
-```
-open test/test.html
-```
-
-### Benchmarking
-
-Requires node.js
-
-```
-npm install uuid uuid-js
-node benchmark/benchmark.js
-```
-
-For a more complete discussion of node-uuid performance, please see the `benchmark/README.md` file, and the [benchmark wiki](https://github.com/broofa/node-uuid/wiki/Benchmark)
-
-For browser performance [checkout the JSPerf tests](http://jsperf.com/node-uuid-performance).
-
-## Release notes
-
-### 1.4.6
-
-* Properly detect node crypto and whatwg crypto
-* Workaround phantomjs/browserify bug
-* Explicit check for `window` rather implicit this-global
-* Issue warning if Math.random() is being used
-* "use strict";
-* A few jshint / stylistic updates (=== and such)
-
-### 1.4.0
-
-* Improved module context detection
-* Removed public RNG functions
-
-### 1.3.2
-
-* Improve tests and handling of v1() options (Issue #24)
-* Expose RNG option to allow for perf testing with different generators
-
-### 1.3.0
-
-* Support for version 1 ids, thanks to [@ctavan](https://github.com/ctavan)!
-* Support for node.js crypto API
-* De-emphasizing performance in favor of a) cryptographic quality PRNGs where available and b) more manageable code
