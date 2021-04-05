@@ -34,7 +34,7 @@ npm install react-native-uuid
 ### 2. Create a UUID (ES6 module syntax)
 
 ```javascript
-import uuid from 'uuid';
+import * as uuid from 'react-native-uuid';
 uuid.v4(); // ⇨ '11edc52b-2918-4d71-9058-f7285e29d894'
 ```
 
