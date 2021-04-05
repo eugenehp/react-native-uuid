@@ -11,7 +11,7 @@
 [![total open issues](https://img.shields.io/github/issues-raw/eugenehp/react-native-uuid.svg?label=total%20open%20issues&style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/eugenehp/react-native-uuid.svg?style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/pulls)
 
-`react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Please note, this library uses pseudo random generator based on top of `Math.randoom`. New version with hardware support is WIP.
+`react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Please note, this library uses pseudo random generator based on top of `Math.random`. New version with hardware support is WIP.
 
 **Heavily inspired by:**
 
