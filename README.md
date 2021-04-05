@@ -1,5 +1,16 @@
 # react-native-uuid
 
+[![GitHub license](https://img.shields.io/github/license/eugenehp/react-native-uuid.svg?color=blue&style=for-the-badge)](./LICENSE)
+[![npm](https://img.shields.io/npm/v/react-native-uuid.svg?color=green&style=for-the-badge)](https://www.npmjs.com/package/react-native-uuid)
+[![npm downloads](https://img.shields.io/npm/dw/react-native-uuid.svg?label=npm%20downloads&style=for-the-badge)](https://npmcharts.com/compare/react-native-uuid?minimal=true)
+[![total npm downloads](https://img.shields.io/npm/dt/react-native-uuid.svg?label=total%20npm%20downloads&style=for-the-badge)](https://npmcharts.com/compare/react-native-uuid?minimal=true)
+[![GitHub watchers](https://img.shields.io/github/watchers/eugenehp/react-native-uuid.svg?style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/watchers)
+[![GitHub stars](https://img.shields.io/github/stars/eugenehp/react-native-uuid.svg?label=GitHub%20stars&style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/eugenehp/react-native-uuid.svg?style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/network/members)
+[![open bugs](https://img.shields.io/github/issues-raw/eugenehp/react-native-uuid/bug.svg?color=d73a4a&label=open%20bugs&style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3Abug)
+[![total open issues](https://img.shields.io/github/issues-raw/eugenehp/react-native-uuid.svg?label=total%20open%20issues&style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/eugenehp/react-native-uuid.svg?style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/pulls)
+
 `react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Please note, this library uses pseudo random generator based on top of `Math.randoom`. New version with hardware support is WIP.
 
 **Heavily inspired by:**
