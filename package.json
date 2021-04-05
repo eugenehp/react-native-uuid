@@ -4,6 +4,10 @@
   "description": "react-native-uuid is a zero-dependency TypeScript implementation of RFC4122.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "test": "ts-jest",
