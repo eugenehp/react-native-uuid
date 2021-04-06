@@ -19,8 +19,8 @@
 **Heavily inspired by:**
 
 - [uuid](https://github.com/uuidjs/uuid)
-
 - [pure-uuid](https://github.com/rse/pure-uuid)
+- [nanoid](https://www.npmjs.com/package/nanoid)
 
 Huge thanks to [Randy Coulman](https://github.com/randycoulman) for the early version of a code.
 
