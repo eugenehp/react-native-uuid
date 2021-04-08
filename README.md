@@ -47,4 +47,10 @@ Previous version has been based on `randombytes` that is not compatible with rea
 Please submit an [issue](https://github.com/eugenehp/react-native-uuid/issues) if you found a bug.
 
 
+## react-native-uuid for enterprise
+
+Available as part of the Tidelift Subscription.
+
+The maintainers of react-native-uuid and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-react-native-uuid?utm_source=npm-react-native-uuid&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+
 Copyright (c) 2016-2021 Eugene Hauptmann
