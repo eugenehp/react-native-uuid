@@ -1,16 +1,25 @@
-export type {GenerateUUID} from './v35';
+import type {GenerateUUID} from './v35';
 
-export {parse} from './parse';
-export {unparse} from './unparse';
-export {validate} from './validate';
-export {version} from './version';
+import {parse} from './parse';
+import {unparse} from './unparse';
+import {validate} from './validate';
+import {version} from './version';
 
-export {v1} from './v1';
-export {v3} from './v3';
-export {v4} from './v4';
-export {v5} from './v5';
-
-export {NIL, DNS, URL, OID, X500} from './utils';
-
+import {v1} from './v1';
+import {v3} from './v3';
 import {v4} from './v4';
-export default v4;
+import {v5} from './v5';
+
+import {NIL, DNS, URL, OID, X500} from './utils';
+
+export default {
+  GenerateUUID,
+  parse,
+  unparse,
+  validate,
+  version,
+  v1,
+  v4,
+  v5,
+  NIL, DNS, URL, OID, X500
+};
