@@ -26,7 +26,7 @@ Huge thanks to [Randy Coulman](https://github.com/randycoulman) for the early ve
 
 ## Getting started
 
-Use this steps to install and create UUIDs.
+Use this steps to install and create UUIDs. Example projec is available [here](https://github.com/eugenehp/RNUUID)
 
 ### 1. Install
 
@@ -34,23 +34,36 @@ Use this steps to install and create UUIDs.
 npm install react-native-uuid
 ```
 
-### 2. Create a UUID (ES6 module syntax)
+### 2. Create a UUID
 
 ```javascript
-import * as uuid from 'react-native-uuid';
+import uuid from 'react-native-uuid';
 uuid.v4(); // ⇨ '11edc52b-2918-4d71-9058-f7285e29d894'
 ```
+
+## Documentation
+
+Methods documentation is available [here](./docs/modules.md)
 
 ## Troubleshooting
 
 Previous version has been based on `randombytes` that is not compatible with react-native out of the box.
 Please submit an [issue](https://github.com/eugenehp/react-native-uuid/issues) if you found a bug.
 
-
 ## react-native-uuid for enterprise
 
 Available as part of the Tidelift Subscription.
 
 The maintainers of react-native-uuid and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-react-native-uuid?utm_source=npm-react-native-uuid&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+
+## Sponsorship
+
+Thank you to our sponsors:
+
+[<img width="300px" src="https://user-images.githubusercontent.com/1857263/114124204-c4e1eb80-98a8-11eb-80ab-64683c24bbc5.png" alt="Reactive Lions™" target="_blank">](https://www.reactivelions.com)
+
+## License
+
+[MIT](./LICENSE)
 
 Copyright (c) 2016-2021 Eugene Hauptmann

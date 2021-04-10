@@ -1,4 +1,4 @@
-import type {GenerateUUID} from './v35';
+export type {GenerateUUID} from './v35';
 
 import {parse} from './parse';
 import {unparse} from './unparse';
@@ -13,13 +13,17 @@ import {v5} from './v5';
 import {NIL, DNS, URL, OID, X500} from './utils';
 
 export default {
-  GenerateUUID,
   parse,
   unparse,
   validate,
   version,
   v1,
+  v3,
   v4,
   v5,
-  NIL, DNS, URL, OID, X500
+  NIL,
+  DNS,
+  URL,
+  OID,
+  X500,
 };
