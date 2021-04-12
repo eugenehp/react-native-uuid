@@ -56,6 +56,10 @@ Available as part of the Tidelift Subscription.
 
 The maintainers of react-native-uuid and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-react-native-uuid?utm_source=npm-react-native-uuid&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
+## Contributing
+
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+
 ## Sponsorship
 
 Thank you to our sponsors:
