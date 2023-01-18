@@ -26,7 +26,7 @@ Huge thanks to [Randy Coulman](https://github.com/randycoulman) for the early ve
 
 ## Getting started
 
-Use this steps to install and create UUIDs. Example projec is available [here](https://github.com/eugenehp/RNUUID)
+Use this steps to install and create UUIDs. Example project is available [here](https://github.com/eugenehp/RNUUID)
 
 ### 1. Install
 
