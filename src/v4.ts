@@ -9,13 +9,25 @@ type V4Options = {
   rng?: () => number[];
 };
 
+// signature overloads to narrow return type
+export function v4(
+  options?: V4Options | string,
+  buf?: undefined,
+  offset?: number,
+): string;
+export function v4(
+  options: V4Options | string | undefined,
+  buf: Array<number>,
+  offset?: number,
+): number[];
+
 // **`v4()` - Generate random UUID**
 // See https://github.com/broofa/node-uuid for API details
-export const v4 = (
+export function v4(
   options?: V4Options | string,
   buf?: Array<number>,
   offset?: number,
-) => {
+) {
   // Deprecated - 'format' argument, as supported in v1.2
   let i = (buf && offset) || 0;
 
@@ -44,4 +56,4 @@ export const v4 = (
   }
 
   return buf || unparse(rnds);
-};
+}
