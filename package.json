@@ -1,6 +1,6 @@
 {
   "name": "react-native-uuid",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "react-native-uuid is a zero-dependency TypeScript implementation of RFC4122.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "ts-jest",
     "docs": "typedoc ./src --entryDocument .",
     "prettier:write": "npx prettier --write **/*.{js,jsx,ts,tsx,json} && npx prettier --write *.{js,jsx,ts,tsx,json}",

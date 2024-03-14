@@ -64,4 +64,4 @@ Thank you to our sponsors:
 
 [MIT](./LICENSE)
 
-Copyright (c) 2016-2021 Eugene Hauptmann
+Copyright (c) 2016-2024 Eugene Hauptmann
