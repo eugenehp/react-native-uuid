@@ -1,6 +1,6 @@
 {
   "name": "react-native-uuid",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "react-native-uuid is a zero-dependency TypeScript implementation of RFC4122.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
