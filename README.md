@@ -13,6 +13,9 @@
 
 [![Packagephobia](https://badgen.net/packagephobia/install/react-native-uuid)](https://packagephobia.com/result?p=react-native-uuid)
 [![Bundlephobia](https://badgen.net/bundlephobia/min/react-native-uuid)](https://bundlephobia.com/result?p=react-native-uuid@2.0.0)
+[![CI Status](https://github.com/eugenehp/react-native-uuid/actions/workflows/ci.yml/badge.svg)](https://github.com/eugenehp/react-native-uuid/actions/workflows/ci.yml)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/en/)
+[![TypeScript](https://img.shields.io/badge/typescript-%3E%3D5.3.0-blue)](https://www.typescriptlang.org/)
 
 `react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Please note, this library uses pseudo random generator based on top of `Math.random`. New version with hardware support is WIP.
 

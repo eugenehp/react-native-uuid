@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '03:00'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'eugenehp'
+    assignees:
+      - 'eugenehp'
+    labels:
+      - 'dependencies'
+      - 'npm'
+    commit-message:
+      prefix: 'chore'
+      prefix-scope: 'deps'
+      include: 'scope'
+    allow:
+      - dependency-type: 'all'
+    ignore:
+      # Add ignored dependencies here if needed
+      - dependency-name: 'none'
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '03:30'
+    reviewers:
+      - 'eugenehp'
+    assignees:
+      - 'eugenehp'
+    labels:
+      - 'ci/cd'
+      - 'github-actions'
+    commit-message:
+      prefix: 'ci'
+      prefix-scope: 'actions'
+      include: 'scope'

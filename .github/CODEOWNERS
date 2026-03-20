@@ -1,0 +1,25 @@
+# Global code owners
+*                 @eugenehp
+
+# TypeScript source files
+/src/**/*.ts      @eugenehp
+
+# Tests
+/src/__tests__/** @eugenehp
+
+# Configuration files
+tsconfig.json     @eugenehp
+*.config.js       @eugenehp
+.eslintrc.js      @eugenehp
+.prettierrc.js    @eugenehp
+
+# CI/CD
+/.github/**       @eugenehp
+
+# Documentation
+*.md              @eugenehp
+/docs/**          @eugenehp
+
+# Dependencies
+package.json      @eugenehp
+package-lock.json @eugenehp
