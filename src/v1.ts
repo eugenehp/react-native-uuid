@@ -43,8 +43,8 @@ export const v1 = (
       options && options.random
         ? options.random
         : options && options.rng
-        ? options.rng()
-        : rng();
+          ? options.rng()
+          : rng();
 
     if (node == null) {
       // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)

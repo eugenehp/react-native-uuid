@@ -60,3 +60,50 @@ buck-out/
 
 dist
 local.sh
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+*.sublime-workspace
+*.sublime-project
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Build and transpile outputs
+dist/
+*.js.map
+*.d.ts.map
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# npm
+.npm/
+.package-lock.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+.tmp/
+tmp/
+temp/
+
+# OS-specific
+Thumbs.db
+.DS_Store

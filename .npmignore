@@ -1,0 +1,49 @@
+# Source files (use dist instead)
+src/
+*.ts
+!dist/**
+
+# Testing
+__tests__/
+*.test.ts
+*.spec.ts
+coverage/
+.nyc_output/
+
+# Configuration
+.eslintrc.js
+.prettierrc.js
+.watchmanconfig
+babel.config.js
+jest.config.js
+tsconfig.json
+
+# Development
+.git/
+.gitattributes
+.gitignore
+.vscode/
+.idea/
+*.iml
+
+# Documentation source
+docs/modules/
+docs/modules.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Dependencies source maps
+*.map
+
+# Environment
+.env*
+
+# Other
+*.log
+.DS_Store
+Thumbs.db
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+SECURITY.md

@@ -35,7 +35,7 @@ export const hex_hmac_sha1 = (k: string, d: string) =>
 export const b64_hmac_sha1 = (k: string, d: string) =>
   rstr2b64(rstr_hmac_sha1(str2rstr_utf8(k), str2rstr_utf8(d)));
 
-export const any_hmac_sha1 = (k: string, d: string, e: string) => 
+export const any_hmac_sha1 = (k: string, d: string, e: string) =>
   rstr2any(rstr_hmac_sha1(str2rstr_utf8(k), str2rstr_utf8(d)), e);
 
 /*

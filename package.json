@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
-    "node": ">=10.0.0",
-    "npm": ">=6.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "scripts": {
     "build": "tsc",
@@ -15,7 +15,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "docs": "typedoc ./src --entryDocument .",
-    "prettier:write": "npx prettier --write **/*.{js,jsx,ts,tsx,json} && npx prettier --write *.{js,jsx,ts,tsx,json}",
+    "prettier:write": "prettier --write **/*.{js,jsx,ts,tsx,json} *.{js,jsx,ts,tsx,json}",
+    "prettier:check": "prettier --check **/*.{js,jsx,ts,tsx,json} *.{js,jsx,ts,tsx,json}",
     "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx ./"
   },
   "repository": {
@@ -47,6 +48,7 @@
     "ts-jest": "^29.4.6",
     "typedoc": "^0.25.4",
     "typedoc-plugin-markdown": "^3.17.1",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "prettier": "^3.2.0"
   }
 }
