@@ -14,6 +14,8 @@
     "prepare": "husky install",
     "test": "jest",
     "bench:rn": "node scripts/benchmark-rn-versions.js",
+    "bench:security": "node scripts/security-benchmark.js",
+    "bench:figures": "node scripts/generate-benchmark-figures.js",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "docs": "typedoc ./src --entryDocument .",

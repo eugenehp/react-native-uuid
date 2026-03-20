@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-03-20T21:05:13.478Z",
+  "machine": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v25.8.1"
+  },
+  "config": {
+    "uuidSamples": 100000,
+    "rngSamples": 200000,
+    "restartBatchSize": 25000,
+    "malformedSamples": 5000
+  },
+  "thresholds": {
+    "maxCollisions": 0,
+    "maxCrossBatchOverlap": 0,
+    "monobitMaxZScore": 4,
+    "runsMaxZScore": 4,
+    "rngChiSquareMax": 420,
+    "malformedCrashCountMax": 0
+  },
+  "metrics": {
+    "collisions": 0,
+    "crossBatchOverlap": 0,
+    "monobit": {
+      "totalBits": 12200000,
+      "ones": 6100040,
+      "pi": 0.5000032786885246,
+      "zScore": 0.022903933372554728
+    },
+    "runs": {
+      "runs": 6097069,
+      "expectedRuns": 6099999.999737705,
+      "zScore": 1.6782856365386973
+    },
+    "rngChiSquare": {
+      "value": 270.66544,
+      "bins": 256,
+      "expectedPerBin": 12500
+    },
+    "malformedInput": {
+      "samples": 5000,
+      "validatedAsTrue": 0,
+      "crashes": 0
+    }
+  },
+  "checks": [
+    {
+      "name": "No v4 collisions in sample",
+      "value": 0,
+      "threshold": 0,
+      "pass": true
+    },
+    {
+      "name": "No cross-batch overlap",
+      "value": 0,
+      "threshold": 0,
+      "pass": true
+    },
+    {
+      "name": "Monobit z-score within bound",
+      "value": 0.0229,
+      "threshold": 4,
+      "pass": true
+    },
+    {
+      "name": "Runs z-score within bound",
+      "value": 1.6783,
+      "threshold": 4,
+      "pass": true
+    },
+    {
+      "name": "RNG chi-square within bound",
+      "value": 270.6654,
+      "threshold": 420,
+      "pass": true
+    },
+    {
+      "name": "Malformed input crash count",
+      "value": 0,
+      "threshold": 0,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

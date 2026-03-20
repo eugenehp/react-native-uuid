@@ -71,6 +71,7 @@ npm run prepublishOnly        # Build before publishing (auto on npm publish)
 
 # Benchmarking
 npm run bench:rn              # Generate benchmark matrix for RN 0.71 - 0.77
+npm run bench:security        # Run security benchmark with pass/fail thresholds
 
 # Documentation
 npm run docs                  # Generate TypeDoc documentation
@@ -91,7 +92,35 @@ Generate fresh results locally:
 ```bash
 npm run bench:rn
 npm test -- --runInBand --json --outputFile benchmarks/results/test-results.json
+npm run bench:security
+npm run bench:figures
 ```
+
+### Charts
+
+![React Native Benchmark Chart](./figures/rn-benchmark-chart.svg)
+![Security Benchmark Chart](./figures/security-benchmark-chart.svg)
+![Test Results Chart](./figures/test-results-chart.svg)
+
+## Security Benchmarking
+
+The security benchmark is designed as a pass/fail gate for randomness quality and misuse safety checks.
+
+- Command: `npm run bench:security`
+- Stored report: `benchmarks/results/security-benchmark.md`
+- Stored data: `benchmarks/results/security-benchmark.json`
+- CI workflow: `.github/workflows/security-benchmark.yml`
+
+Current threshold gates:
+
+- v4 sample collisions: `0`
+- Cross-batch overlap (restart proxy): `0`
+- Monobit test z-score: `<= 4`
+- Runs test z-score: `<= 4`
+- RNG chi-square score (256 bins): `<= 420`
+- Malformed input crashes: `0`
+
+The CI job fails if any threshold is exceeded.
 
 ## Documentation
 
