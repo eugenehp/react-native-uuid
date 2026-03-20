@@ -26,6 +26,11 @@ tsconfig.json
 .idea/
 *.iml
 
+# Benchmarks, figures, and scripts (dev-only)
+benchmarks/
+figures/
+scripts/
+
 # Documentation source
 docs/modules/
 docs/modules.md
