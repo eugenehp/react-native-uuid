@@ -41,7 +41,7 @@ export const v35 = (
     let bytes = new Uint8Array(16 + value.length);
     bytes.set(namespace);
     bytes.set(value, namespace.length);
-    bytes = stringToBytes(hashfunc(bytesToString(bytes)));
+    bytes = stringToBytes(hashfunc(bytesToString(bytes.buffer as ArrayBuffer))) as any;
 
     bytes[6] = (bytes[6] & 0x0f) | version;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
