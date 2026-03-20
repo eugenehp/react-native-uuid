@@ -1,0 +1,45 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run benchmark
+        run: npm run bench:rn
+
+      - name: Run tests and store JSON report
+        run: npm test -- --runInBand --json --outputFile benchmarks/results/test-results.json
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-node-${{ matrix.node-version }}
+          path: |
+            benchmarks/results/rn-version-benchmark.md
+            benchmarks/results/rn-version-benchmark.json
+            benchmarks/results/test-results.json
+          if-no-files-found: error

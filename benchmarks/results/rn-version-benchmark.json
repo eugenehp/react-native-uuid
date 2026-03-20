@@ -1,0 +1,264 @@
+{
+  "generatedAt": "2026-03-20T21:00:32.958Z",
+  "machine": {
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "note": "Benchmarks run in Node.js as a deterministic cross-version baseline for React Native compatibility tracking.",
+  "cases": [
+    "v1()",
+    "v3(name, DNS)",
+    "v4()",
+    "v5(name, DNS)",
+    "validate(sample)",
+    "parse(sample)",
+    "unparse(parse(sample))"
+  ],
+  "matrix": [
+    {
+      "reactNative": "0.71",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 3742754
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 326541
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 6373029
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 317917
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 21025153
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1433325
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1288136
+        }
+      ]
+    },
+    {
+      "reactNative": "0.72",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 3963804
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 330648
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 7510444
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 322144
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 21709436
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1444367
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1282244
+        }
+      ]
+    },
+    {
+      "reactNative": "0.73",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 3970762
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 339675
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 7322118
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 326851
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 21715725
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1494171
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1332384
+        }
+      ]
+    },
+    {
+      "reactNative": "0.74",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 4029388
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 347862
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 7537144
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 239771
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 21767722
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1446966
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1316856
+        }
+      ]
+    },
+    {
+      "reactNative": "0.75",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 4011634
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 346323
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 7522497
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 330222
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 21756077
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1443711
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1300756
+        }
+      ]
+    },
+    {
+      "reactNative": "0.76",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 4092155
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 339249
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 7114948
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 318478
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 20201510
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1398724
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1281209
+        }
+      ]
+    },
+    {
+      "reactNative": "0.77",
+      "node": "v25.8.1",
+      "iterations": 100000,
+      "results": [
+        {
+          "case": "v1()",
+          "opsPerSec": 3892672
+        },
+        {
+          "case": "v3(name, DNS)",
+          "opsPerSec": 329397
+        },
+        {
+          "case": "v4()",
+          "opsPerSec": 7219848
+        },
+        {
+          "case": "v5(name, DNS)",
+          "opsPerSec": 320051
+        },
+        {
+          "case": "validate(sample)",
+          "opsPerSec": 20076794
+        },
+        {
+          "case": "parse(sample)",
+          "opsPerSec": 1421314
+        },
+        {
+          "case": "unparse(parse(sample))",
+          "opsPerSec": 1284319
+        }
+      ]
+    }
+  ]
+}

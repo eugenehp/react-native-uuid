@@ -13,6 +13,7 @@
     "prepublishOnly": "npm run build",
     "prepare": "husky install",
     "test": "jest",
+    "bench:rn": "node scripts/benchmark-rn-versions.js",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "docs": "typedoc ./src --entryDocument .",

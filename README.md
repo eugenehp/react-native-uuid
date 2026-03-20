@@ -69,8 +69,28 @@ npm run prettier:check        # Check formatting without changes
 npm run build                 # Build TypeScript to JavaScript
 npm run prepublishOnly        # Build before publishing (auto on npm publish)
 
+# Benchmarking
+npm run bench:rn              # Generate benchmark matrix for RN 0.71 - 0.77
+
 # Documentation
 npm run docs                  # Generate TypeDoc documentation
+```
+
+## Benchmarking
+
+We keep a baseline benchmark matrix for major React Native versions:
+
+- React Native: 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.77
+- Cases: `v1`, `v3`, `v4`, `v5`, `validate`, `parse`, `unparse`
+- Stored benchmark results: `benchmarks/results/rn-version-benchmark.md`
+- Stored benchmark data: `benchmarks/results/rn-version-benchmark.json`
+- Stored test report: `benchmarks/results/test-results.json`
+
+Generate fresh results locally:
+
+```bash
+npm run bench:rn
+npm test -- --runInBand --json --outputFile benchmarks/results/test-results.json
 ```
 
 ## Documentation
