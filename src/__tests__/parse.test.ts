@@ -67,9 +67,7 @@ describe('parse', () => {
       const result = parse(shortUuid);
       expect(result).toHaveLength(16);
       // Last bytes should be 0
-      expect(result.slice(4)).toEqual([
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      ]);
+      expect(result.slice(4)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     });
 
     it('should handle empty string', () => {

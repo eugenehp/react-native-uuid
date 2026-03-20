@@ -98,7 +98,9 @@ describe('v5', () => {
       const offset = 8;
       v5('example.com', DNS, buf, offset);
       // Bytes at offset should have data
-      expect(buf.slice(offset, offset + 16).some((b: number) => b !== 0)).toBe(true);
+      expect(buf.slice(offset, offset + 16).some((b: number) => b !== 0)).toBe(
+        true,
+      );
     });
 
     it('should allow reading buffer as valid UUID', () => {
@@ -159,7 +161,9 @@ describe('v5', () => {
     it('should throw error with descriptive message for invalid namespace', () => {
       expect(() => {
         v5('example.com', [1, 2, 3] as any);
-      }).toThrow('Namespace must be array-like (16 iterable integer values, 0-255)');
+      }).toThrow(
+        'Namespace must be array-like (16 iterable integer values, 0-255)',
+      );
     });
   });
 
@@ -217,7 +221,7 @@ describe('v5', () => {
       const uuid = v5('www.python.org', DNS) as string;
       expect(validate(uuid)).toBe(true);
       // Multiple calls should produce same result
-      expect((v5('www.python.org', DNS) as string)).toBe(uuid);
+      expect(v5('www.python.org', DNS) as string).toBe(uuid);
     });
   });
 });

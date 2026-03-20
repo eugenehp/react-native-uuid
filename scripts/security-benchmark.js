@@ -22,7 +22,7 @@ const THRESHOLDS = {
   malformedCrashCountMax: 0,
 };
 
-const countBits = (n) => {
+const countBits = n => {
   let x = n;
   let c = 0;
   while (x) {
@@ -32,7 +32,7 @@ const countBits = (n) => {
   return c;
 };
 
-const variableBitsFromUuidBytes = (bytes) => {
+const variableBitsFromUuidBytes = bytes => {
   const bits = [];
 
   for (let i = 0; i < bytes.length; i += 1) {
@@ -55,7 +55,7 @@ const variableBitsFromUuidBytes = (bytes) => {
   return bits;
 };
 
-const randomHex = (length) => {
+const randomHex = length => {
   let output = '';
   for (let i = 0; i < length; i += 1) {
     output += Math.floor(Math.random() * 16).toString(16);
@@ -128,10 +128,20 @@ const run = () => {
   }
 
   const pi = ones / totalVariableBits;
-  const monobitZScore = Math.abs((ones - totalVariableBits / 2) / Math.sqrt(totalVariableBits / 4));
+  const monobitZScore = Math.abs(
+    (ones - totalVariableBits / 2) / Math.sqrt(totalVariableBits / 4),
+  );
   const expectedRuns = 2 * totalVariableBits * pi * (1 - pi);
-  const varianceRuns = (2 * totalVariableBits * pi * (1 - pi) * (2 * totalVariableBits * pi * (1 - pi) - 1)) / (totalVariableBits - 1);
-  const runsZScore = Math.abs((runs - expectedRuns) / Math.sqrt(Math.max(varianceRuns, 1e-9)));
+  const varianceRuns =
+    (2 *
+      totalVariableBits *
+      pi *
+      (1 - pi) *
+      (2 * totalVariableBits * pi * (1 - pi) - 1)) /
+    (totalVariableBits - 1);
+  const runsZScore = Math.abs(
+    (runs - expectedRuns) / Math.sqrt(Math.max(varianceRuns, 1e-9)),
+  );
 
   const histogram = new Array(256).fill(0);
   for (let i = 0; i < CONFIG.rngSamples; i += 1) {
@@ -202,7 +212,7 @@ const run = () => {
     },
   ];
 
-  const allPassed = checks.every((c) => c.pass);
+  const allPassed = checks.every(c => c.pass);
 
   const payload = {
     generatedAt: startedAt,
@@ -249,7 +259,8 @@ const run = () => {
   fs.writeFileSync(jsonPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 
   const rows = checks.map(
-    (c) => `| ${c.name} | ${c.value} | ${c.threshold} | ${c.pass ? 'PASS' : 'FAIL'} |`,
+    c =>
+      `| ${c.name} | ${c.value} | ${c.threshold} | ${c.pass ? 'PASS' : 'FAIL'} |`,
   );
 
   const markdown = [

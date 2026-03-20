@@ -121,9 +121,7 @@ describe('utils', () => {
   describe('stringToBytes', () => {
     it('should convert ASCII string to bytes', () => {
       const result = stringToBytes('hello');
-      expect(result).toEqual(
-        new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f]),
-      );
+      expect(result).toEqual(new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f]));
     });
 
     it('should convert empty string to empty byte array', () => {

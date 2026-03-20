@@ -1,11 +1,11 @@
 /**
  * React Native UUID Examples
- * 
+ *
  * This file demonstrates how to use react-native-uuid in a React Native application
  */
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import uuid from 'react-native-uuid';
 
 /**
@@ -24,9 +24,7 @@ export function GenerateUUIDExample() {
       <TouchableOpacity style={styles.button} onPress={handleGenerateUUID}>
         <Text style={styles.buttonText}>Generate UUID</Text>
       </TouchableOpacity>
-      {generatedUUID && (
-        <Text style={styles.uuidText}>{generatedUUID}</Text>
-      )}
+      {generatedUUID && <Text style={styles.uuidText}>{generatedUUID}</Text>}
     </View>
   );
 }
@@ -37,7 +35,7 @@ export function GenerateUUIDExample() {
 export function TodoListExample() {
   const [todos, setTodos] = useState([]);
 
-  const addTodo = (title) => {
+  const addTodo = title => {
     const newTodo = {
       id: uuid.v4(),
       title,
@@ -48,9 +46,11 @@ export function TodoListExample() {
 
   return (
     <View>
-      {todos.map((todo) => (
+      {todos.map(todo => (
         <View key={todo.id} style={styles.todoItem}>
-          <Text>{todo.title} - {todo.id}</Text>
+          <Text>
+            {todo.title} - {todo.id}
+          </Text>
         </View>
       ))}
     </View>
@@ -61,7 +61,7 @@ export function TodoListExample() {
  * Example 3: Generating deterministic IDs from user data
  */
 export function DeterministicIDExample() {
-  const generateUserID = (userName) => {
+  const generateUserID = userName => {
     // v5 creates the same UUID for the same input
     return uuid.v5(userName, uuid.DNS);
   };
@@ -83,18 +83,18 @@ export function DeterministicIDExample() {
 export function CustomRNGExample() {
   // For most cases, the default RNG is sufficient
   // But if you need cryptographically secure random numbers:
-  
+
   const generateSecureV4 = async () => {
     // In React Native, you can use react-native-get-random-values
     // or another cryptographic library
     // Example with a custom RNG:
-    
+
     const customRNG = () => {
       // Return 16 random bytes (0-255)
-      return Array.from({ length: 16 }, () => Math.floor(Math.random() * 256));
+      return Array.from({length: 16}, () => Math.floor(Math.random() * 256));
     };
 
-    return uuid.v4({ rng: customRNG });
+    return uuid.v4({rng: customRNG});
   };
 
   return (
@@ -120,7 +120,7 @@ export function ValidateUUIDExample() {
     <View style={styles.container}>
       <Text>Enter a UUID to validate</Text>
       {isValid !== null && (
-        <Text style={{ color: isValid ? 'green' : 'red' }}>
+        <Text style={{color: isValid ? 'green' : 'red'}}>
           {isValid ? 'Valid UUID' : 'Invalid UUID'}
         </Text>
       )}
@@ -166,16 +166,18 @@ export class ObjectTracker {
 export function ObjectTrackerExample() {
   const tracker = new ObjectTracker();
 
-  const id1 = tracker.createObject({ name: 'Item 1' });
-  const id2 = tracker.createObject({ name: 'Item 2' });
+  const id1 = tracker.createObject({name: 'Item 1'});
+  const id2 = tracker.createObject({name: 'Item 2'});
 
   const objects = tracker.getAllObjects();
 
   return (
     <View>
-      {objects.map((obj) => (
+      {objects.map(obj => (
         <View key={obj.id}>
-          <Text>{obj.data.name}: {obj.id}</Text>
+          <Text>
+            {obj.data.name}: {obj.id}
+          </Text>
         </View>
       ))}
     </View>

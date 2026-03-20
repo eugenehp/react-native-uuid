@@ -7,7 +7,7 @@ const ROOT = path.join(__dirname, '..');
 const RESULTS_DIR = path.join(ROOT, 'benchmarks', 'results');
 const FIGURES_DIR = path.join(ROOT, 'figures');
 
-const readJson = (fileName) =>
+const readJson = fileName =>
   JSON.parse(fs.readFileSync(path.join(RESULTS_DIR, fileName), 'utf8'));
 
 const writeFile = (name, content) => {
@@ -15,9 +15,17 @@ const writeFile = (name, content) => {
   console.log(`Generated ./figures/${name}`);
 };
 
-const palette = ['#1f77b4', '#e4572e', '#17bebb', '#ffc914', '#6a4c93', '#2e8540', '#d7263d'];
+const palette = [
+  '#1f77b4',
+  '#e4572e',
+  '#17bebb',
+  '#ffc914',
+  '#6a4c93',
+  '#2e8540',
+  '#d7263d',
+];
 
-const esc = (value) =>
+const esc = value =>
   String(value)
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
@@ -25,9 +33,15 @@ const esc = (value) =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&apos;');
 
-  const estimateTextWidth = (text, pxPerChar = 7) => String(text).length * pxPerChar;
+const estimateTextWidth = (text, pxPerChar = 7) =>
+  String(text).length * pxPerChar;
 
-const svgShell = (width, height, body, title) => `<?xml version="1.0" encoding="UTF-8"?>
+const svgShell = (
+  width,
+  height,
+  body,
+  title,
+) => `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(
   title,
 )}">
@@ -44,23 +58,27 @@ const svgShell = (width, height, body, title) => `<?xml version="1.0" encoding="
   ${body}
 </svg>`;
 
-const makeRnBenchmarkChart = (rnJson) => {
-  const legendWidth = Math.max(...rnJson.cases.map((c) => estimateTextWidth(c, 7.2))) + 70;
+const makeRnBenchmarkChart = rnJson => {
+  const legendWidth =
+    Math.max(...rnJson.cases.map(c => estimateTextWidth(c, 7.2))) + 70;
   const width = 1080 + legendWidth;
   const height = 760;
-  const margin = { top: 90, right: legendWidth, bottom: 100, left: 80 };
+  const margin = {top: 90, right: legendWidth, bottom: 100, left: 80};
   const plotW = width - margin.left - margin.right;
   const plotH = height - margin.top - margin.bottom;
 
-  const versions = rnJson.matrix.map((m) => m.reactNative);
+  const versions = rnJson.matrix.map(m => m.reactNative);
   const cases = rnJson.cases;
-  const maxY = Math.max(...rnJson.matrix.flatMap((m) => m.results.map((r) => r.opsPerSec)));
+  const maxY = Math.max(
+    ...rnJson.matrix.flatMap(m => m.results.map(r => r.opsPerSec)),
+  );
 
-  const x = (i) => margin.left + (i * plotW) / (versions.length - 1);
-  const y = (v) => margin.top + plotH - (v / maxY) * plotH;
+  const x = i => margin.left + (i * plotW) / (versions.length - 1);
+  const y = v => margin.top + plotH - (v / maxY) * plotH;
 
   let body = `<text class="title" x="${margin.left}" y="44">React Native Benchmark (ops/sec by RN version)</text>`;
   body += `<text class="note" x="${margin.left}" y="64">Generated from ./benchmarks/results/rn-version-benchmark.json</text>`;
+  body += `<text class="label" text-anchor="middle" transform="translate(20,${margin.top + plotH / 2}) rotate(-90)">ops/sec</text>`;
 
   for (let i = 0; i <= 5; i += 1) {
     const gy = margin.top + (i * plotH) / 5;
@@ -80,7 +98,7 @@ const makeRnBenchmarkChart = (rnJson) => {
     const color = palette[caseIndex % palette.length];
     const points = rnJson.matrix
       .map((m, i) => {
-        const match = m.results.find((r) => r.case === caseName);
+        const match = m.results.find(r => r.case === caseName);
         return `${x(i)},${y(match.opsPerSec)}`;
       })
       .join(' ');
@@ -88,7 +106,7 @@ const makeRnBenchmarkChart = (rnJson) => {
     body += `<polyline fill="none" stroke="${color}" stroke-width="2.2" points="${points}" />`;
 
     rnJson.matrix.forEach((m, i) => {
-      const match = m.results.find((r) => r.case === caseName);
+      const match = m.results.find(r => r.case === caseName);
       body += `<circle cx="${x(i)}" cy="${y(match.opsPerSec)}" r="3" fill="${color}" />`;
     });
 
@@ -101,19 +119,30 @@ const makeRnBenchmarkChart = (rnJson) => {
   return svgShell(width, height, body, 'React Native benchmark line chart');
 };
 
-const makeSecurityChart = (securityJson) => {
-  const leftLabelWidth = Math.max(...securityJson.checks.map((c) => estimateTextWidth(c.name, 6.8))) + 40;
+const makeSecurityChart = securityJson => {
+  const leftLabelWidth =
+    Math.max(...securityJson.checks.map(c => estimateTextWidth(c.name, 6.8))) +
+    40;
   const rightValueWidth =
-    Math.max(...securityJson.checks.map((c) => estimateTextWidth(`${c.value} / ${c.threshold}`, 6.8))) + 24;
+    Math.max(
+      ...securityJson.checks.map(c =>
+        estimateTextWidth(`${c.value} / ${c.threshold}`, 6.8),
+      ),
+    ) + 24;
   const width = leftLabelWidth + 620 + rightValueWidth + 28;
   const height = 560;
-  const margin = { top: 90, right: rightValueWidth + 20, bottom: 70, left: leftLabelWidth };
+  const margin = {
+    top: 90,
+    right: rightValueWidth + 20,
+    bottom: 70,
+    left: leftLabelWidth,
+  };
   const plotW = width - margin.left - margin.right;
   const rowH = 60;
 
   const checks = securityJson.checks;
 
-  const ratio = (c) => {
+  const ratio = c => {
     if (c.threshold === 0) return c.value === 0 ? 0 : 1;
     return c.value / c.threshold;
   };
@@ -144,24 +173,29 @@ const makeSecurityChart = (securityJson) => {
     )}</text>`;
   });
 
-  return svgShell(width, height, body, 'Security benchmark threshold utilization');
+  return svgShell(
+    width,
+    height,
+    body,
+    'Security benchmark threshold utilization',
+  );
 };
 
-const makeTestChart = (testJson) => {
+const makeTestChart = testJson => {
   const width = 900;
   const height = 420;
-  const margin = { top: 90, right: 60, bottom: 80, left: 90 };
+  const margin = {top: 90, right: 60, bottom: 80, left: 90};
   const plotW = width - margin.left - margin.right;
   const plotH = height - margin.top - margin.bottom;
 
   const values = [
-    { name: 'Passed', value: testJson.numPassedTests, color: '#1f9d55' },
-    { name: 'Failed', value: testJson.numFailedTests, color: '#d7263d' },
-    { name: 'Pending', value: testJson.numPendingTests, color: '#f59e0b' },
-    { name: 'Todo', value: testJson.numTodoTests, color: '#6366f1' },
+    {name: 'Passed', value: testJson.numPassedTests, color: '#1f9d55'},
+    {name: 'Failed', value: testJson.numFailedTests, color: '#d7263d'},
+    {name: 'Pending', value: testJson.numPendingTests, color: '#f59e0b'},
+    {name: 'Todo', value: testJson.numTodoTests, color: '#6366f1'},
   ];
 
-  const maxY = Math.max(...values.map((v) => v.value), 1);
+  const maxY = Math.max(...values.map(v => v.value), 1);
   const barW = plotW / values.length - 30;
 
   let body = `<text class="title" x="${margin.left}" y="44">Test Result Summary</text>`;

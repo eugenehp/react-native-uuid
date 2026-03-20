@@ -96,9 +96,7 @@ describe('Integration Tests', () => {
 
   describe('UUID comparison and uniqueness', () => {
     it('should generate unique v4 UUIDs', () => {
-      const uuids = new Set(
-        Array.from({length: 100}, () => uuid.v4()),
-      );
+      const uuids = new Set(Array.from({length: 100}, () => uuid.v4()));
       expect(uuids.size).toBe(100);
     });
 
@@ -247,9 +245,7 @@ describe('Integration Tests', () => {
     });
 
     it('should generate unique session IDs', () => {
-      const sessionIds = new Set(
-        Array.from({length: 50}, () => uuid.v4()),
-      );
+      const sessionIds = new Set(Array.from({length: 50}, () => uuid.v4()));
       expect(sessionIds.size).toBe(50);
     });
 
@@ -302,6 +298,30 @@ describe('Integration Tests', () => {
       }
       const elapsed = Date.now() - start;
       expect(elapsed).toBeLessThan(5000);
+    });
+  });
+
+  describe('Named exports', () => {
+    it('should expose all functions as named exports', () => {
+      expect(typeof v1).toBe('function');
+      expect(typeof v3).toBe('function');
+      expect(typeof v4).toBe('function');
+      expect(typeof v5).toBe('function');
+      expect(typeof parse).toBe('function');
+      expect(typeof unparse).toBe('function');
+      expect(typeof validate).toBe('function');
+      expect(typeof version).toBe('function');
+    });
+
+    it('named exports should match default export methods', () => {
+      expect(v1).toBe(uuid.v1);
+      expect(v3).toBe(uuid.v3);
+      expect(v4).toBe(uuid.v4);
+      expect(v5).toBe(uuid.v5);
+      expect(parse).toBe(uuid.parse);
+      expect(unparse).toBe(uuid.unparse);
+      expect(validate).toBe(uuid.validate);
+      expect(version).toBe(uuid.version);
     });
   });
 });

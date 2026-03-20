@@ -47,12 +47,12 @@ const benchmarkCases = [
   },
 ];
 
-const toOpsPerSec = (elapsedNs) => {
+const toOpsPerSec = elapsedNs => {
   const seconds = Number(elapsedNs) / 1e9;
   return Math.round(ITERATIONS / seconds);
 };
 
-const runCase = (fn) => {
+const runCase = fn => {
   for (let i = 0; i < WARMUP; i += 1) fn();
 
   const start = process.hrtime.bigint();
@@ -65,8 +65,8 @@ const runCase = (fn) => {
 const nowIso = new Date().toISOString();
 const nodeVersion = process.version;
 
-const matrix = RN_VERSIONS.map((rnVersion) => {
-  const results = benchmarkCases.map((testCase) => ({
+const matrix = RN_VERSIONS.map(rnVersion => {
+  const results = benchmarkCases.map(testCase => ({
     case: testCase.name,
     opsPerSec: runCase(testCase.run),
   }));
@@ -90,7 +90,7 @@ const jsonPayload = {
     arch: process.arch,
   },
   note: 'Benchmarks run in Node.js as a deterministic cross-version baseline for React Native compatibility tracking.',
-  cases: benchmarkCases.map((testCase) => testCase.name),
+  cases: benchmarkCases.map(testCase => testCase.name),
   matrix,
 };
 
@@ -113,17 +113,14 @@ const tableHeader = [
   '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
 ];
 
-const formatOps = (value) => value.toLocaleString('en-US');
+const formatOps = value => value.toLocaleString('en-US');
 
-const rows = matrix.map((entry) => {
-  const values = entry.results.map((item) => formatOps(item.opsPerSec));
+const rows = matrix.map(entry => {
+  const values = entry.results.map(item => formatOps(item.opsPerSec));
   return `| ${entry.reactNative} | ${values.join(' | ')} |`;
 });
 
-const footer = [
-  '',
-  'Unit: operations/second (higher is better).',
-];
+const footer = ['', 'Unit: operations/second (higher is better).'];
 
 const markdown = [...header, ...tableHeader, ...rows, ...footer].join('\n');
 

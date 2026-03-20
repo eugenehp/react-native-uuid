@@ -28,6 +28,9 @@ jobs:
       - name: Run security benchmark
         run: npm run bench:security
 
+      - name: Generate benchmark figures
+        run: npm run bench:figures
+
       - name: Upload security benchmark artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -35,4 +38,5 @@ jobs:
           path: |
             benchmarks/results/security-benchmark.md
             benchmarks/results/security-benchmark.json
+            figures/security-benchmark-chart.svg
           if-no-files-found: error

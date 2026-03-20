@@ -88,7 +88,9 @@ describe('v3', () => {
       const offset = 8;
       v3('example.com', DNS, buf, offset);
       // Bytes at offset should have data
-      expect(buf.slice(offset, offset + 16).some((b: number) => b !== 0)).toBe(true);
+      expect(buf.slice(offset, offset + 16).some((b: number) => b !== 0)).toBe(
+        true,
+      );
     });
 
     it('should allow reading buffer as valid UUID', () => {
@@ -149,7 +151,9 @@ describe('v3', () => {
     it('should throw error with descriptive message for invalid namespace', () => {
       expect(() => {
         v3('example.com', [1, 2, 3] as any);
-      }).toThrow('Namespace must be array-like (16 iterable integer values, 0-255)');
+      }).toThrow(
+        'Namespace must be array-like (16 iterable integer values, 0-255)',
+      );
     });
   });
 

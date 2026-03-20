@@ -1,6 +1,6 @@
 /**
  * Basic UUID Generation Examples
- * 
+ *
  * This file demonstrates the most common use cases for react-native-uuid
  */
 
@@ -31,13 +31,18 @@ console.log('UUID bytes:', bytes);
 // Output: UUID bytes: Uint8Array(16) [ 85, 14, 132, 0, 226, 155, 65, 212, 167, 22, 68, 102, 85, 68, 0, 0 ]
 
 // Example 6: Convert UUID bytes back to string
-const byteArray = [85, 14, 132, 0, 226, 155, 65, 212, 167, 22, 68, 102, 85, 68, 0, 0];
+const byteArray = [
+  85, 14, 132, 0, 226, 155, 65, 212, 167, 22, 68, 102, 85, 68, 0, 0,
+];
 const reconstructed = uuid.unparse(byteArray);
 console.log('Reconstructed UUID:', reconstructed);
 // Output: Reconstructed UUID: 550e8400-e29b-41d4-a716-446655440000
 
 // Example 7: Validate a UUID
-console.log('Is "550e8400-e29b-41d4-a716-446655440000" valid?', uuid.validate('550e8400-e29b-41d4-a716-446655440000'));
+console.log(
+  'Is "550e8400-e29b-41d4-a716-446655440000" valid?',
+  uuid.validate('550e8400-e29b-41d4-a716-446655440000'),
+);
 // Output: Is "550e8400-e29b-41d4-a716-446655440000" valid? true
 
 console.log('Is "invalid-uuid" valid?', uuid.validate('invalid-uuid'));

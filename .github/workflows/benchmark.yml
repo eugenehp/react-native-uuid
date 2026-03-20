@@ -34,6 +34,9 @@ jobs:
       - name: Run tests and store JSON report
         run: npm test -- --runInBand --json --outputFile benchmarks/results/test-results.json
 
+      - name: Generate benchmark figures
+        run: npm run bench:figures
+
       - name: Upload benchmark artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -42,4 +45,6 @@ jobs:
             benchmarks/results/rn-version-benchmark.md
             benchmarks/results/rn-version-benchmark.json
             benchmarks/results/test-results.json
+            figures/rn-benchmark-chart.svg
+            figures/test-results-chart.svg
           if-no-files-found: error
