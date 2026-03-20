@@ -26,19 +26,48 @@ Huge thanks to [Randy Coulman](https://github.com/randycoulman) for the early ve
 
 ## Getting started
 
-Use this steps to install and create UUIDs. Example project is available [here](https://github.com/eugenehp/RNUUID)
+### Requirements
 
-### 1. Install
+- **Node.js**: 18.0.0 or higher (16.x also supported)
+- **npm**: 9.0.0 or higher
+
+### Installation
 
 ```shell
 npm install react-native-uuid
 ```
 
-### 2. Create a UUID
+### Creating a UUID
 
 ```javascript
 import uuid from 'react-native-uuid';
 uuid.v4(); // ⇨ '11edc52b-2918-4d71-9058-f7285e29d894'
+```
+
+## Development
+
+### Available Scripts
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+npm test -- --watch          # Watch mode
+npm test -- --coverage       # With coverage report
+
+# Linting and formatting
+npm run lint                  # Lint TypeScript and JavaScript
+npm run prettier:write        # Format all files
+npm run prettier:check        # Check formatting without changes
+
+# Building
+npm run build                 # Build TypeScript to JavaScript
+npm run prepublishOnly        # Build before publishing (auto on npm publish)
+
+# Documentation
+npm run docs                  # Generate TypeDoc documentation
 ```
 
 ## Documentation
