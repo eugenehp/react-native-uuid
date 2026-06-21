@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub issue and pull request templates
 - prettier:check script for CI/CD validation
 - Enhanced TypeScript compiler options for stricter type checking
+- Added `uuid` named export so you can auto-import this library
 
 ### Changed
 
