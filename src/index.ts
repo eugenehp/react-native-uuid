@@ -12,7 +12,7 @@ import {v5} from './v5';
 
 import {NIL, DNS, URL, OID, X500} from './utils';
 
-export default {
+export const uuid = {
   parse,
   unparse,
   validate,
@@ -27,3 +27,5 @@ export default {
   OID,
   X500,
 };
+
+export default uuid;
