@@ -48,7 +48,7 @@ const sha1_vm_test = () =>
 /*
  * Calculate the SHA1 of a raw string
  */
-const rstr_sha1 = (s: string) =>
+export const rstr_sha1 = (s: string) =>
   binb2rstr(binb_sha1(rstr2binb(s), s.length * 8));
 
 /*

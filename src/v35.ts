@@ -38,12 +38,17 @@ export const v35 = (
     // Compute hash of namespace and value, Per 4.3
     // Future: Use spread syntax when supported on all platforms, e.g.
     // `bytes = hashfunc([...namespace, ... value])`
-    let bytes = new Uint8Array(16 + value.length);
-    bytes.set(namespace);
-    bytes.set(value, namespace.length);
-    bytes = stringToBytes(
-      hashfunc(bytesToString(bytes.buffer as ArrayBuffer)),
-    ) as any;
+    const input = new Uint8Array(16 + value.length);
+    input.set(namespace);
+    input.set(value, namespace.length);
+
+    // hashfunc operates on raw binary strings (one char per byte) and returns
+    // the raw binary digest, so no UTF-8 or hex re-encoding happens here.
+    const digest = hashfunc(bytesToString(input.buffer as ArrayBuffer));
+    const bytes = new Uint8Array(16);
+    for (let i = 0; i < 16; ++i) {
+      bytes[i] = digest.charCodeAt(i);
+    }
 
     bytes[6] = (bytes[6] & 0x0f) | version;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;

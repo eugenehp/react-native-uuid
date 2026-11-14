@@ -224,4 +224,25 @@ describe('v5', () => {
       expect(v5('www.python.org', DNS) as string).toBe(uuid);
     });
   });
+
+  // Reference values from RFC 4122 Appendix B / Python's uuid module (issue #52)
+  describe('RFC 4122 test vectors', () => {
+    it('should match the RFC example for www.example.com in DNS namespace', () => {
+      expect(v5('www.example.com', DNS)).toBe(
+        '2ed6657d-e927-568b-95e1-2665a8aea6a2',
+      );
+    });
+
+    it('should match reference output for a namespace with bytes >= 0x80', () => {
+      expect(v5('orderId', 'f87ff660-ef24-47a6-b9a8-d64545dd6a4e')).toBe(
+        '02cd8985-1b72-5e1f-a597-392fc492ca68',
+      );
+    });
+
+    it('should match reference output for non-ASCII names', () => {
+      expect(v5('https://example.com/héllo/日本', URL)).toBe(
+        '522b061b-f239-5805-8aa5-4faeed816f1d',
+      );
+    });
+  });
 });

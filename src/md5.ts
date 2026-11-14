@@ -49,7 +49,8 @@ const md5_vm_test = () =>
 /*
  * Calculate the MD5 of a raw string
  */
-const rstr_md5 = (s: string) => binl2rstr(binl_md5(rstr2binl(s), s.length * 8));
+export const rstr_md5 = (s: string) =>
+  binl2rstr(binl_md5(rstr2binl(s), s.length * 8));
 
 /*
  * Calculate the HMAC-MD5, of a key and some data (raw strings)
