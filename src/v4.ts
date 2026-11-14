@@ -5,7 +5,7 @@ import {rng} from './rng';
 // https://github.com/DavidAnson/generateRandomUUID/blob/master/generateRandomUUID.js
 
 type V4Options = {
-  random: number[];
+  random?: number[];
   rng?: () => number[];
 };
 
@@ -33,16 +33,9 @@ export function v4(
 
   // buf = new Array<number>(16);
 
-  let rnds: number[] = rng();
-
-  if (options && !(options instanceof String)) {
-    if ((options as V4Options).random) {
-      rnds = (options as V4Options).random;
-    }
-    if ((options as V4Options).rng) {
-      rnds = (options as V4Options).rng!();
-    }
-  }
+  const opts: V4Options =
+    options && typeof options === 'object' ? (options as V4Options) : {};
+  const rnds: number[] = opts.random || (opts.rng || rng)();
 
   // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
   rnds[6] = (rnds[6] & 0x0f) | 0x40;

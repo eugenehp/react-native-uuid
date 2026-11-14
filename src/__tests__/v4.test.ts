@@ -182,4 +182,13 @@ describe('v4', () => {
       expect(hasZeroes).toBeLessThan(50);
     });
   });
+
+  describe('Option precedence (parity with uuid)', () => {
+    it('should prefer options.random over options.rng', () => {
+      const random = new Array(16).fill(0);
+      const rng = jest.fn(() => new Array(16).fill(0xff));
+      expect(v4({random, rng})).toBe('00000000-0000-4000-8000-000000000000');
+      expect(rng).not.toHaveBeenCalled();
+    });
+  });
 });

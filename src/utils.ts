@@ -27,7 +27,17 @@ export const stringToBytes = (str: string): Uint8Array => {
   return bytes as any as Uint8Array;
 };
 
+// Converted in chunks so large inputs don't exceed the engine's argument limit
+const CHUNK_SIZE = 0x8000;
+
 export const bytesToString = (buf: ArrayBufferLike) => {
   const bufferView = new Uint8Array(buf, 0, (buf as any).byteLength);
-  return String.fromCharCode.apply(null, Array.from(bufferView));
+  let result = '';
+  for (let j = 0; j < bufferView.length; j += CHUNK_SIZE) {
+    result += String.fromCharCode.apply(
+      null,
+      Array.from(bufferView.subarray(j, j + CHUNK_SIZE)),
+    );
+  }
+  return result;
 };

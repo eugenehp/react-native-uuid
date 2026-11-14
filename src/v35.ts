@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import {stringify} from './stringify';
 import {parse} from './parse';
+import {validate} from './validate';
 import {stringToBytes, bytesToString} from './utils';
 
 export type GenerateUUID = (
@@ -26,6 +27,9 @@ export const v35 = (
     }
 
     if (typeof namespace === 'string') {
+      if (!validate(namespace)) {
+        throw TypeError('Invalid UUID');
+      }
       namespace = parse(namespace);
     }
 

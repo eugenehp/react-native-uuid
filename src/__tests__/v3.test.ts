@@ -155,6 +155,10 @@ describe('v3', () => {
         'Namespace must be array-like (16 iterable integer values, 0-255)',
       );
     });
+
+    it('should throw for a namespace string that is not a valid UUID', () => {
+      expect(() => v3('example.com', 'not-a-uuid')).toThrow('Invalid UUID');
+    });
   });
 
   describe('Common namespace use cases', () => {
@@ -224,6 +228,14 @@ describe('v3', () => {
     it('should match reference output for non-ASCII names', () => {
       expect(v3('https://example.com/héllo/日本', URL)).toBe(
         '86fd4512-767d-32fa-a6f2-f58cc7e16ad4',
+      );
+    });
+  });
+
+  describe('Large input', () => {
+    it('should hash names larger than the engine argument limit', () => {
+      expect(v3('a'.repeat(300000), DNS)).toBe(
+        'a88122d3-53c1-3704-b91f-80d74d3a83ef',
       );
     });
   });

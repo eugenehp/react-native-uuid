@@ -3,12 +3,12 @@ import {stringify} from './stringify';
 import {rng} from './rng';
 
 type V1Options = {
-  node: number[];
-  clockseq: number;
-  msecs: number;
-  nsecs: number;
-  random: number[];
-  rng: () => number[];
+  node?: number[];
+  clockseq?: number;
+  msecs?: number;
+  nsecs?: number;
+  random?: number[];
+  rng?: () => number[];
 };
 
 // **`v1()` - Generate time-based UUID**
@@ -31,20 +31,16 @@ export const v1 = (
 ) => {
   let i = (buf && offset) || 0;
   const b = buf || new Uint8Array(16);
+  const opts: V1Options = options || {};
 
-  let node = options && options.node ? options.node : _nodeId;
-  let clockseq = options && options.clockseq ? options.clockseq : _clockseq;
+  let node = opts.node || _nodeId;
+  let clockseq = opts.clockseq !== undefined ? opts.clockseq : _clockseq;
 
   // node and clockseq need to be initialized to random values if they're not
   // specified.  We do this lazily to minimize issues related to insufficient
   // system entropy.  See #189
   if (node == null || clockseq == null) {
-    const seedBytes =
-      options && options.random
-        ? options.random
-        : options && options.rng
-          ? options.rng()
-          : rng();
+    const seedBytes = opts.random || (opts.rng || rng)();
 
     if (node == null) {
       // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
@@ -68,23 +64,23 @@ export const v1 = (
   // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
   // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
   // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-  let msecs: number = options && options.msecs ? options.msecs : Date.now();
+  let msecs: number = opts.msecs !== undefined ? opts.msecs : Date.now();
 
   // Per 4.2.1.2, use count of uuid's generated during the current clock
   // cycle to simulate higher resolution clock
-  let nsecs: number = options && options.nsecs ? options.nsecs : _lastNSecs + 1;
+  let nsecs: number = opts.nsecs !== undefined ? opts.nsecs : _lastNSecs + 1;
 
   // Time since last uuid creation (in msecs)
   const dt: number = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000;
 
   // Per 4.2.1.2, Bump clockseq on clock regression
-  if (dt < 0 && options && !options.clockseq) {
+  if (dt < 0 && opts.clockseq === undefined) {
     clockseq = (clockseq + 1) & 0x3fff;
   }
 
   // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
   // time interval
-  if ((dt < 0 || msecs > _lastMSecs) && options && !options.nsecs) {
+  if ((dt < 0 || msecs > _lastMSecs) && opts.nsecs === undefined) {
     nsecs = 0;
   }
 

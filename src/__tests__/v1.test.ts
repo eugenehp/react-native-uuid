@@ -162,4 +162,44 @@ describe('v1', () => {
       expect(uuid1.slice(-12)).toBe(uuid2.slice(-12));
     });
   });
+
+  // Reference values from the uuid npm package
+  describe('Option handling (parity with uuid)', () => {
+    const options = {
+      node: [0x01, 0x23, 0x45, 0x67, 0x89, 0xab],
+      clockseq: 0x1234,
+      msecs: new Date('2011-11-01').getTime(),
+      nsecs: 5678,
+    };
+
+    it('should produce the reference UUID for fixed options', () => {
+      expect(v1(options)).toBe('710b962e-041c-11e1-9234-0123456789ab');
+    });
+
+    it('should honor clockseq: 0', () => {
+      expect(v1({...options, clockseq: 0})).toBe(
+        '710b962e-041c-11e1-8000-0123456789ab',
+      );
+    });
+
+    it('should honor nsecs: 0', () => {
+      expect(v1({...options, nsecs: 0})).toBe(
+        '710b8000-041c-11e1-9234-0123456789ab',
+      );
+    });
+
+    it('should honor msecs: 0', () => {
+      expect(v1({...options, msecs: 0, nsecs: 0})).toBe(
+        '13814000-1dd2-11b2-9234-0123456789ab',
+      );
+    });
+
+    it('should not throw after many calls without options', () => {
+      expect(() => {
+        for (let i = 0; i < 20000; i++) {
+          v1();
+        }
+      }).not.toThrow();
+    });
+  });
 });
