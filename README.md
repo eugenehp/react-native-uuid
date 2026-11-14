@@ -17,7 +17,11 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/en/)
 [![TypeScript](https://img.shields.io/badge/typescript-%3E%3D5.3.0-blue)](https://www.typescriptlang.org/)
 
-`react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Please note, this library uses pseudo random generator based on top of `Math.random`. New version with hardware support is WIP.
+`react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Random values (used by `v1` and `v4`) come from `crypto.getRandomValues` whenever it is available: browsers, Node.js 19+, and React Native apps that install a polyfill such as [`react-native-get-random-values`](https://github.com/LinusU/react-native-get-random-values). Without it, the library falls back to `Math.random`, which is **not** cryptographically secure. If your UUIDs need to be unguessable, install a polyfill and import it once before generating UUIDs:
+
+```js
+import 'react-native-get-random-values';
+```
 
 **Heavily inspired by:**
 
