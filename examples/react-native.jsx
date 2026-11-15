@@ -4,8 +4,14 @@
  * This file demonstrates how to use react-native-uuid in a React Native application
  */
 
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import uuid from 'react-native-uuid';
 
 /**
@@ -41,11 +47,17 @@ export function TodoListExample() {
       title,
       completed: false,
     };
-    setTodos([...todos, newTodo]);
+    setTodos(current => [...current, newTodo]);
   };
 
   return (
-    <View>
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => addTodo(`Todo ${todos.length + 1}`)}
+      >
+        <Text style={styles.buttonText}>Add todo</Text>
+      </TouchableOpacity>
       {todos.map(todo => (
         <View key={todo.id} style={styles.todoItem}>
           <Text>
@@ -78,28 +90,30 @@ export function DeterministicIDExample() {
 }
 
 /**
- * Example 4: Using custom RNG for v4 UUIDs (if needed)
+ * Example 4: Time-ordered IDs (v7) and the random source in use
+ *
+ * v7 UUIDs sort by creation time, which suits database keys. Random bytes
+ * come from crypto.getRandomValues or the bundled native module; randomSource()
+ * reports 'Math.random' only if neither is available (e.g. Expo Go without a
+ * polyfill).
  */
-export function CustomRNGExample() {
-  // For most cases, the default RNG is sufficient
-  // But if you need cryptographically secure random numbers:
-
-  const generateSecureV4 = async () => {
-    // In React Native, you can use react-native-get-random-values
-    // or another cryptographic library
-    // Example with a custom RNG:
-
-    const customRNG = () => {
-      // Return 16 random bytes (0-255)
-      return Array.from({length: 16}, () => Math.floor(Math.random() * 256));
-    };
-
-    return uuid.v4({rng: customRNG});
-  };
+export function SortableIDExample() {
+  const [ids, setIds] = useState([]);
 
   return (
-    <View>
-      <Text>Custom RNG v4 UUID: {generateSecureV4()}</Text>
+    <View style={styles.container}>
+      <Text>Random source: {uuid.randomSource()}</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => setIds(current => [...current, uuid.v7()])}
+      >
+        <Text style={styles.buttonText}>Generate v7 UUID</Text>
+      </TouchableOpacity>
+      {ids.map(id => (
+        <Text key={id} style={styles.uuidText}>
+          {id}
+        </Text>
+      ))}
     </View>
   );
 }
@@ -109,19 +123,24 @@ export function CustomRNGExample() {
  */
 export function ValidateUUIDExample() {
   const [inputUUID, setInputUUID] = useState('');
-  const [isValid, setIsValid] = useState(null);
-
-  const handleValidate = () => {
-    const valid = uuid.validate(inputUUID);
-    setIsValid(valid);
-  };
+  const isValid = inputUUID.length > 0 ? uuid.validate(inputUUID) : null;
 
   return (
     <View style={styles.container}>
       <Text>Enter a UUID to validate</Text>
+      <TextInput
+        style={styles.input}
+        value={inputUUID}
+        onChangeText={setInputUUID}
+        autoCapitalize="none"
+        autoCorrect={false}
+        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      />
       {isValid !== null && (
         <Text style={{color: isValid ? 'green' : 'red'}}>
-          {isValid ? 'Valid UUID' : 'Invalid UUID'}
+          {isValid
+            ? `Valid UUID (v${uuid.version(inputUUID)})`
+            : 'Invalid UUID'}
         </Text>
       )}
     </View>
@@ -164,15 +183,18 @@ export class ObjectTracker {
 
 // Example usage
 export function ObjectTrackerExample() {
-  const tracker = new ObjectTracker();
+  // Keep one tracker for the component's lifetime
+  const trackerRef = useRef(null);
+  if (!trackerRef.current) {
+    trackerRef.current = new ObjectTracker();
+    trackerRef.current.createObject({name: 'Item 1'});
+    trackerRef.current.createObject({name: 'Item 2'});
+  }
 
-  const id1 = tracker.createObject({name: 'Item 1'});
-  const id2 = tracker.createObject({name: 'Item 2'});
-
-  const objects = tracker.getAllObjects();
+  const objects = trackerRef.current.getAllObjects();
 
   return (
-    <View>
+    <View style={styles.container}>
       {objects.map(obj => (
         <View key={obj.id}>
           <Text>
@@ -198,6 +220,15 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  input: {
+    marginTop: 8,
+    marginBottom: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderRadius: 8,
+    fontFamily: 'Courier New',
   },
   uuidText: {
     marginTop: 16,

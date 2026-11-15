@@ -62,48 +62,29 @@ describe('parse', () => {
       expect(buf[offset]).toBe(0x55);
     });
 
-    it('should fill remaining bytes with 0 if string is short', () => {
-      const shortUuid = '550e8400';
-      const result = parse(shortUuid);
-      expect(result).toHaveLength(16);
-      // Last bytes should be 0
-      expect(result.slice(4)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    });
-
-    it('should handle empty string', () => {
-      const result = parse('');
-      expect(result).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    it('should throw for a negative offset', () => {
+      expect(() =>
+        parse('550e8400-e29b-41d4-a716-446655440000', [], -1),
+      ).toThrow(RangeError);
     });
   });
 
   describe('Edge cases', () => {
-    it('should parse UUID without hyphens', () => {
-      const uuid = '550e8400e29b41d4a716446655440000';
-      const result = parse(uuid);
-      expect(result).toHaveLength(16);
-      expect(result[0]).toBe(0x55);
-    });
-
-    it('should ignore invalid characters and parse valid hex', () => {
-      // Only valid hex pairs are parsed
-      const uuid = '550e8400-e29b-41d4-a716-446655440000';
-      const result = parse(uuid);
-      expect(result).toHaveLength(16);
-    });
-
-    it('should not overflow buffer', () => {
-      const veryLongString = '550e8400-e29b-41d4-a716-446655440000-extra-stuff';
-      const result = parse(veryLongString);
-      expect(result).toHaveLength(16);
-    });
-
-    it('should handle odd hex string length', () => {
-      const result = parse('a');
-      expect(result).toHaveLength(16);
+    it.each([
+      ['a short string', '550e8400'],
+      ['an empty string', ''],
+      ['a UUID without hyphens', '550e8400e29b41d4a716446655440000'],
+      ['trailing characters', '550e8400-e29b-41d4-a716-446655440000-extra'],
+      ['a single character', 'a'],
+      ['non-hex characters', 'zzzzzzzz-zzzz-4zzz-8zzz-zzzzzzzzzzzz'],
+      ['an invalid version', '550e8400-e29b-91d4-a716-446655440000'],
+      ['an invalid variant', '550e8400-e29b-41d4-c716-446655440000'],
+    ])('should throw for %s', (_label, input) => {
+      expect(() => parse(input)).toThrow(new TypeError('Invalid UUID'));
     });
 
     it('should correctly parse each byte position', () => {
-      const uuid = '01234567-89ab-cdef-0123-456789abcdef';
+      const uuid = '01234567-89ab-4def-8123-456789abcdef';
       const result = parse(uuid);
       expect(result[0]).toBe(0x01);
       expect(result[1]).toBe(0x23);
@@ -111,9 +92,9 @@ describe('parse', () => {
       expect(result[3]).toBe(0x67);
       expect(result[4]).toBe(0x89);
       expect(result[5]).toBe(0xab);
-      expect(result[6]).toBe(0xcd);
+      expect(result[6]).toBe(0x4d);
       expect(result[7]).toBe(0xef);
-      expect(result[8]).toBe(0x01);
+      expect(result[8]).toBe(0x81);
       expect(result[9]).toBe(0x23);
       expect(result[10]).toBe(0x45);
       expect(result[11]).toBe(0x67);

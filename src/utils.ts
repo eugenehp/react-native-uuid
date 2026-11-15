@@ -1,8 +1,8 @@
-let _byteToHex: string[] = [];
-let _hexToByte: {[key: string]: number} = {};
+const _byteToHex: string[] = [];
+const _hexToByte: {[key: string]: number} = {};
 
-for (var i = 0; i < 256; i++) {
-  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
+for (let i = 0; i < 256; i++) {
+  _byteToHex[i] = (i + 0x100).toString(16).slice(1);
   _hexToByte[_byteToHex[i]] = i;
 }
 
@@ -14,30 +14,47 @@ export const URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
 export const OID = '6ba7b812-9dad-11d1-80b4-00c04fd430c8';
 export const X500 = '6ba7b814-9dad-11d1-80b4-00c04fd430c8';
 export const NIL = '00000000-0000-0000-0000-000000000000';
+export const MAX = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
+/** A writable 16+ byte buffer that UUID bytes can be written into. */
+export type UUIDBuffer = number[] | Uint8Array;
+
+/**
+ * UTF-8 encode a string. Throws `URIError` on lone surrogates, like the
+ * `uuid` package.
+ */
 export const stringToBytes = (str: string): Uint8Array => {
-  str = unescape(encodeURIComponent(str)); // UTF8 escape
+  const encoded = encodeURIComponent(str);
+  const bytes: number[] = [];
 
-  const bytes = new Uint8Array(str.length);
-
-  for (let j = 0; j < str.length; ++j) {
-    bytes[j] = str.charCodeAt(j);
+  for (let j = 0; j < encoded.length; j++) {
+    if (encoded[j] === '%') {
+      bytes.push(_hexToByte[encoded.slice(j + 1, j + 3).toLowerCase()]);
+      j += 2;
+    } else {
+      bytes.push(encoded.charCodeAt(j));
+    }
   }
 
-  return bytes as any as Uint8Array;
+  return new Uint8Array(bytes);
 };
 
-// Converted in chunks so large inputs don't exceed the engine's argument limit
-const CHUNK_SIZE = 0x8000;
-
-export const bytesToString = (buf: ArrayBufferLike) => {
-  const bufferView = new Uint8Array(buf, 0, (buf as any).byteLength);
-  let result = '';
-  for (let j = 0; j < bufferView.length; j += CHUNK_SIZE) {
-    result += String.fromCharCode.apply(
-      null,
-      Array.from(bufferView.subarray(j, j + CHUNK_SIZE)),
+/**
+ * Copy 16 bytes into `buf` at `offset`. Plain arrays grow as needed; typed
+ * arrays must be large enough.
+ */
+export const writeBytes = <T extends UUIDBuffer>(
+  bytes: ArrayLike<number>,
+  buf: T,
+  offset: number = 0,
+): T => {
+  if (offset < 0 || (!Array.isArray(buf) && offset + 16 > buf.length)) {
+    throw new RangeError(
+      `UUID byte range ${offset}:${offset + 15} is out of buffer bounds`,
     );
   }
-  return result;
+  for (let i = 0; i < 16; i++) {
+    buf[offset + i] = bytes[i];
+  }
+  return buf;
 };

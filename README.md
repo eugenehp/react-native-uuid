@@ -12,16 +12,12 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/eugenehp/react-native-uuid.svg?style=for-the-badge)](https://github.com/eugenehp/react-native-uuid/pulls)
 
 [![Packagephobia](https://badgen.net/packagephobia/install/react-native-uuid)](https://packagephobia.com/result?p=react-native-uuid)
-[![Bundlephobia](https://badgen.net/bundlephobia/min/react-native-uuid)](https://bundlephobia.com/result?p=react-native-uuid@2.0.0)
+[![Bundlephobia](https://badgen.net/bundlephobia/min/react-native-uuid)](https://bundlephobia.com/result?p=react-native-uuid)
 [![CI Status](https://github.com/eugenehp/react-native-uuid/actions/workflows/ci.yml/badge.svg)](https://github.com/eugenehp/react-native-uuid/actions/workflows/ci.yml)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/en/)
-[![TypeScript](https://img.shields.io/badge/typescript-%3E%3D5.3.0-blue)](https://www.typescriptlang.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen)](https://nodejs.org/en/)
+[![TypeScript](https://img.shields.io/badge/typescript-%3E%3D5.0.0-blue)](https://www.typescriptlang.org/)
 
-`react-native-uuid` is a zero-dependency TypeScript implementation of [RFC4122](https://tools.ietf.org/html/rfc4122) standard **A Universally Unique IDentifier (UUID) URN Namespace**. Random values (used by `v1` and `v4`) come from `crypto.getRandomValues` whenever it is available: browsers, Node.js 19+, and React Native apps that install a polyfill such as [`react-native-get-random-values`](https://github.com/LinusU/react-native-get-random-values). Without it, the library falls back to `Math.random`, which is **not** cryptographically secure. If your UUIDs need to be unguessable, install a polyfill and import it once before generating UUIDs:
-
-```js
-import 'react-native-get-random-values';
-```
+`react-native-uuid` is a zero-dependency TypeScript implementation of [RFC 9562](https://www.rfc-editor.org/rfc/rfc9562) (which obsoletes [RFC 4122](https://www.rfc-editor.org/rfc/rfc4122)) **Universally Unique IDentifiers**, with an API compatible with the [`uuid`](https://github.com/uuidjs/uuid) package. It supports UUID versions 1, 3, 4, 5, 6 and 7, and works in React Native, browsers and Node.js.
 
 **Heavily inspired by:**
 
@@ -35,23 +31,66 @@ Huge thanks to [Randy Coulman](https://github.com/randycoulman) for the early ve
 
 ### Requirements
 
-- **Node.js**: 18.0.0 or higher (16.x also supported)
-- **npm**: 9.0.0 or higher
+- **Node.js**: 22.0.0 or higher (for Node.js usage and development)
+- **npm**: 10.0.0 or higher
+- **React Native**: 0.74 or higher (optional peer dependency; not needed for Node.js or browsers)
 
 ### Installation
 
 ```shell
 npm install react-native-uuid
+cd ios && pod install # React Native iOS only
 ```
 
-### Creating a UUID
+The package includes a small native module (iOS and Android) that provides secure random bytes. It is autolinked, so a native rebuild is all that is needed. In environments without it (Expo Go, web) the library uses `crypto.getRandomValues` or falls back as described in [Random values](#random-values).
+
+### Usage
 
 ```javascript
 import uuid from 'react-native-uuid';
-// Or: import { uuid } from 'react-native-uuid';
+// Or import only what you need:
+import {v4, v7, validate} from 'react-native-uuid';
 
 uuid.v4(); // ⇨ '11edc52b-2918-4d71-9058-f7285e29d894'
+uuid.v7(); // ⇨ '01a1dcb5-96f0-76d7-b0f0-515332ecb719' (sorts by creation time)
+uuid.v5('www.example.com', uuid.DNS); // ⇨ '2ed6657d-e927-568b-95e1-2665a8aea6a2'
 ```
+
+| Function                                  | Description                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| `v1()`                                    | Time-based UUID                                                          |
+| `v3(name, namespace)`                     | Name-based UUID (MD5)                                                    |
+| `v4()`                                    | Random UUID                                                              |
+| `v5(name, namespace)`                     | Name-based UUID (SHA-1)                                                  |
+| `v6()`                                    | Time-based UUID, field-reordered so it sorts by time                     |
+| `v7()`                                    | Unix-epoch time-based UUID; sorts by time, good for database keys        |
+| `v1ToV6(uuid)` / `v6ToV1(uuid)`           | Convert between v1 and v6                                                |
+| `parse(uuid)` / `stringify(bytes)`        | Convert between string and bytes (both validate)                         |
+| `unparse(bytes)`                          | Convert bytes to a string without validating                             |
+| `validate(uuid)` / `version(uuid)`        | Check a UUID string / get its version                                    |
+| `NIL`, `MAX`, `DNS`, `URL`, `OID`, `X500` | Special UUIDs and standard namespaces                                    |
+| `randomSource()`                          | Which random source is in use: `'crypto'`, `'native'` or `'Math.random'` |
+
+Generators accept an optional `buf` (array or `Uint8Array`) and `offset` to write the 16 bytes instead of returning a string. See the [API documentation](./docs/modules.md) for all options.
+
+### Random values
+
+`v1`, `v4`, `v6` and `v7` need random bytes. The library uses, in order:
+
+1. `crypto.getRandomValues` when available: browsers, Node.js, and React Native with a polyfill such as [`react-native-get-random-values`](https://github.com/LinusU/react-native-get-random-values).
+2. The bundled native module on React Native: `SecRandomCopyBytes` on iOS, `SecureRandom` on Android.
+3. `Math.random`, which is **not** cryptographically secure. This only happens when neither of the above is available, e.g. in Expo Go without a polyfill.
+
+Call `uuid.randomSource()` to check which one your app is using.
+
+### Migrating from 2.x
+
+- **`v3()` and `v5()` return different values.** 2.x produced non-standard UUIDs ([#52](https://github.com/eugenehp/react-native-uuid/issues/52)); 3.x matches RFC 9562, the `uuid` package and Python. Re-generate any stored v3/v5 UUIDs, or keep 2.x for reading old ones.
+- **`parse()` throws `TypeError('Invalid UUID')`** for invalid input instead of returning zero-filled bytes. Call `validate()` first if input may be invalid. `v3()`/`v5()` also throw for an invalid namespace string.
+- **Deep imports are no longer supported** (e.g. `react-native-uuid/dist/v4`). Import from `react-native-uuid` instead.
+- **`validate()` accepts versions 6-8 and the max UUID** (`ffffffff-ffff-ffff-ffff-ffffffffffff`).
+- **Node.js 22+** is required.
+- **React Native:** run `pod install` and rebuild the app to link the native random module.
 
 ## Development
 
@@ -67,16 +106,17 @@ npm test -- --watch          # Watch mode
 npm test -- --coverage       # With coverage report
 
 # Linting and formatting
-npm run lint                  # Lint TypeScript and JavaScript
+npm run lint                  # Type-check and lint
 npm run prettier:write        # Format all files
 npm run prettier:check        # Check formatting without changes
 
 # Building
-npm run build                 # Build TypeScript to JavaScript
-npm run prepublishOnly        # Build before publishing (auto on npm publish)
+npm run build                 # Build CommonJS (dist/cjs) and ES modules (dist/esm)
+npm run check:package         # Build and validate package exports and types
+npm run size                  # Check bundle size limits (.size-limit.json)
 
 # Benchmarking
-npm run bench:rn              # Generate benchmark matrix for RN 0.71 - 0.77
+npm run bench:perf            # Performance benchmark vs the uuid package
 npm run bench:security        # Run security benchmark with pass/fail thresholds
 
 # Documentation
@@ -85,18 +125,17 @@ npm run docs                  # Generate TypeDoc documentation
 
 ## Benchmarking
 
-We keep a baseline benchmark matrix for major React Native versions:
+`npm run bench:perf` measures operations per second for each function in Node.js, next to the [`uuid`](https://github.com/uuidjs/uuid) package in the same process (best of 7 interleaved runs). Results depend on the machine, so compare the ratios rather than absolute numbers; Hermes on a device is slower in absolute terms.
 
-- React Native: 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.77
-- Cases: `v1`, `v3`, `v4`, `v5`, `validate`, `parse`, `unparse`
-- Stored benchmark results: `benchmarks/results/rn-version-benchmark.md`
-- Stored benchmark data: `benchmarks/results/rn-version-benchmark.json`
+- Cases: `v1`, `v3`, `v4`, `v5`, `v6`, `v7`, `validate`, `parse`, `stringify`
+- Stored results: [`benchmarks/results/performance-benchmark.md`](./benchmarks/results/performance-benchmark.md) (data: `performance-benchmark.json`)
 - Stored test report: `benchmarks/results/test-results.json`
 
 Generate fresh results locally:
 
 ```bash
-npm run bench:rn
+npm run build
+npm run bench:perf
 npm test -- --runInBand --json --outputFile benchmarks/results/test-results.json
 npm run bench:security
 npm run bench:figures
@@ -104,7 +143,7 @@ npm run bench:figures
 
 ### Charts
 
-![React Native Benchmark Chart](./figures/rn-benchmark-chart.svg)
+![Performance Chart](./figures/performance-chart.svg)
 ![Security Benchmark Chart](./figures/security-benchmark-chart.svg)
 ![Test Results Chart](./figures/test-results-chart.svg)
 
@@ -130,11 +169,13 @@ The CI job fails if any threshold is exceeded.
 
 ## Documentation
 
-Methods documentation is available [here](./docs/modules.md)
+API documentation is available [here](./docs/modules.md). Regenerate it with `npm run docs`.
 
 ## Troubleshooting
 
-Previous version has been based on `randombytes` that is not compatible with react-native out of the box.
+- **`uuid.randomSource()` returns `'Math.random'` on React Native**: rebuild the app after installing (`cd ios && pod install`) so the native module is linked. Expo Go can't load custom native modules; use a development build or install `react-native-get-random-values`.
+- **Upgrading from 2.x**: see [Migrating from 2.x](#migrating-from-2x).
+
 Please submit an [issue](https://github.com/eugenehp/react-native-uuid/issues) if you found a bug.
 
 ## Contributing

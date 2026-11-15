@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [master, main, develop]
+    tags: ['v*']
   pull_request:
     branches: [master, main, develop]
 
@@ -11,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [22.x, 24.x, 26.x]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
@@ -30,11 +31,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage thresholds
+        run: npm test -- --coverage
 
       - name: Check formatting
         run: npm run prettier:check
+
+      - name: Check package exports and types
+        run: npm run check:package
+
+      - name: Check bundle size
+        run: npm run size
 
   publish:
     needs: test
@@ -42,14 +49,15 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: read
-      packages: write
+      # Required for npm trusted publishing (OIDC) and provenance
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '20.x'
+          node-version: '26.x'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
@@ -58,7 +66,23 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Trusted publishing needs npm >= 11.5.1
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      # Authenticates via OIDC (no NPM_TOKEN secret) and attaches provenance.
+      # Requires a trusted publisher for this repo and workflow on npmjs.com.
+      # Pre-release versions (containing "-", e.g. 3.1.0-rc.0) go to the
+      # `next` dist-tag so they aren't installed by default
       - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $VERSION"
+            exit 1
+          fi
+          case "$VERSION" in
+            *-*) DIST_TAG=next ;;
+            *) DIST_TAG=latest ;;
+          esac
+          npm publish --provenance --access public --tag "$DIST_TAG"

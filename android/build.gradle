@@ -1,0 +1,28 @@
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+apply plugin: "com.android.library"
+
+android {
+  if (project.android.hasProperty("namespace")) {
+    namespace "com.reactnativeuuid"
+  }
+
+  compileSdkVersion safeExtGet("compileSdkVersion", 35)
+
+  defaultConfig {
+    minSdkVersion safeExtGet("minSdkVersion", 24)
+    targetSdkVersion safeExtGet("targetSdkVersion", 35)
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  // Version is resolved by the React Native Gradle plugin in the host app
+  implementation "com.facebook.react:react-android"
+}

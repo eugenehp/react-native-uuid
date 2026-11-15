@@ -8,8 +8,8 @@ When contributing to this repository, please:
 
 ## Requirements
 
-- **Node.js**: 18.0.0 or higher
-- **npm**: 9.0.0 or higher
+- **Node.js**: 22.0.0 or higher
+- **npm**: 10.0.0 or higher
 
 ## Development Setup
 
@@ -44,7 +44,7 @@ npm run docs
 This project uses:
 
 - **Prettier** for code formatting (configured in `.prettierrc.js`)
-- **ESLint** for linting (configured in `.eslintrc.js`)
+- **ESLint** for linting (configured in `eslint.config.js`)
 - **TypeScript** with strict mode enabled
 - **Husky** pre-commit hooks to enforce quality standards
 
@@ -62,11 +62,13 @@ Code must be:
 3. Make your changes and write/update tests
 4. Run the full test suite and ensure all tests pass:
    ```bash
-   npm test
+   npm test -- --coverage   # enforces coverage thresholds
    npm run lint
    npm run prettier:check
-   npm run build
+   npm run check:package    # builds, then validates exports and types
+   npm run size             # bundle size limits
    ```
+   If you change native code (`ios/`, `android/`), also build and run a React Native app against it on both platforms (see [Testing native code](#testing-native-code)).
 5. Commit with clear, descriptive messages following conventional commits:
    - `feat: add new feature`
    - `fix: resolve bug`
@@ -95,6 +97,45 @@ npm test                      # Run all tests
 npm test -- --coverage       # Run with coverage report
 npm test -- --watch          # Watch mode for development
 ```
+
+### Testing native code
+
+Native code isn't built in CI. To test it, create an app with the latest React Native, install the packed library, and run it on iOS and Android:
+
+```bash
+npm pack                                   # creates react-native-uuid-<version>.tgz
+npx @react-native-community/cli@latest init UUIDTest
+cd UUIDTest
+npm install ../react-native-uuid-<version>.tgz
+cd ios && pod install && cd ..
+npx react-native run-ios --mode Release
+npx react-native run-android --mode release
+```
+
+In the app, `uuid.randomSource()` should return `'native'` when no `crypto` polyfill is installed.
+
+## Releasing
+
+Releases are published to npm by CI when a `v*` tag is pushed (`.github/workflows/ci.yml`), using npm trusted publishing (OIDC) with provenance; no npm token is stored in the repository.
+
+One-time setup: on npmjs.com, add a trusted publisher for this package with repository `eugenehp/react-native-uuid` and workflow `ci.yml`.
+
+1. Update `CHANGELOG.md`: move entries from `[Unreleased]` into a new version section.
+2. Bump the version without creating a tag yet:
+   ```bash
+   npm version <version> --no-git-tag-version
+   ```
+3. Regenerate the API docs (`npm run docs`) and update `gitRevision` in `typedoc.json` to the new tag.
+4. For releases that touch native code or change behavior, test on iOS and Android first (see [Testing native code](#testing-native-code)).
+5. Commit, tag and push. The tag must start with `v`:
+   ```bash
+   git commit -am "release <version>"
+   git tag v<version>
+   git push origin master v<version>
+   ```
+6. CI runs the full test matrix and publishes only if every job passes.
+
+**Pre-releases**: use a version with a suffix, e.g. `npm version 3.1.0-rc.0 --no-git-tag-version` and tag `v3.1.0-rc.0`. CI publishes versions containing `-` under the `next` dist-tag, so `npm install react-native-uuid` keeps installing the latest stable release; testers install with `npm install react-native-uuid@next`. CI also refuses to publish if the tag doesn't match the `package.json` version.
 
 ## Commit Messages
 

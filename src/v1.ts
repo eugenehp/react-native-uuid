@@ -1,14 +1,22 @@
 /* eslint-disable no-bitwise */
-import {stringify} from './stringify';
-import {rng} from './rng';
+import {unsafeStringify} from './stringify.js';
+import {rng} from './rng.js';
+import {UUIDBuffer, writeBytes} from './utils.js';
 
-type V1Options = {
-  node?: number[];
+/** Options for {@link v1} and {@link v6}. Every field is optional. */
+export type V1Options = {
+  /** 6-byte node ID. Defaults to a random value (with the multicast bit set). */
+  node?: ArrayLike<number>;
+  /** 14-bit clock sequence. Defaults to a random value. */
   clockseq?: number;
+  /** Time in milliseconds since the Unix epoch. Defaults to `Date.now()`. */
   msecs?: number;
+  /** Extra time in 100-nanosecond units (0-9999) added to `msecs`. */
   nsecs?: number;
-  random?: number[];
-  rng?: () => number[];
+  /** 16 random bytes used to seed `node` and `clockseq`. */
+  random?: ArrayLike<number>;
+  /** Function returning 16 random bytes, used instead of `random`. */
+  rng?: () => ArrayLike<number>;
 };
 
 // **`v1()` - Generate time-based UUID**
@@ -16,25 +24,31 @@ type V1Options = {
 // Inspired by https://github.com/LiosK/UUID.js
 // and http://docs.python.org/library/uuid.html
 
-let _nodeId: number[];
-let _clockseq: number;
+let _nodeId: number[] | undefined;
+let _clockseq: number | undefined;
 
 // Previous uuid creation time
 let _lastMSecs = 0;
 let _lastNSecs = 0;
 
-// See https://github.com/uuidjs/uuid for API details
-export const v1 = (
-  options?: V1Options,
-  buf?: Uint8Array,
-  offset: number = 0,
-) => {
-  let i = (buf && offset) || 0;
-  const b = buf || new Uint8Array(16);
-  const opts: V1Options = options || {};
-
-  let node = opts.node || _nodeId;
-  let clockseq = opts.clockseq !== undefined ? opts.clockseq : _clockseq;
+/**
+ * Write a v1 UUID's 16 bytes into `b`.
+ * @internal `randomNode` makes node and clockseq random per call (used by v6).
+ */
+export const v1Bytes = (
+  opts: V1Options,
+  b: Uint8Array,
+  randomNode: boolean = false,
+): Uint8Array => {
+  let i = 0;
+  let node: ArrayLike<number> | undefined =
+    opts.node || (randomNode ? undefined : _nodeId);
+  let clockseq =
+    opts.clockseq !== undefined
+      ? opts.clockseq
+      : randomNode
+        ? undefined
+        : _clockseq;
 
   // node and clockseq need to be initialized to random values if they're not
   // specified.  We do this lazily to minimize issues related to insufficient
@@ -44,7 +58,7 @@ export const v1 = (
 
     if (node == null) {
       // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [
+      node = [
         seedBytes[0] | 0x01,
         seedBytes[1],
         seedBytes[2],
@@ -52,11 +66,17 @@ export const v1 = (
         seedBytes[4],
         seedBytes[5],
       ];
+      if (!randomNode) {
+        _nodeId = node as number[];
+      }
     }
 
     if (clockseq == null) {
       // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = ((seedBytes[6] << 8) | seedBytes[7]) & 0x3fff;
+      clockseq = ((seedBytes[6] << 8) | seedBytes[7]) & 0x3fff;
+      if (!randomNode) {
+        _clockseq = clockseq;
+      }
     }
   }
 
@@ -91,7 +111,9 @@ export const v1 = (
 
   _lastMSecs = msecs;
   _lastNSecs = nsecs;
-  _clockseq = clockseq;
+  if (!randomNode) {
+    _clockseq = clockseq;
+  }
 
   // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
   msecs += 12219292800000;
@@ -123,5 +145,36 @@ export const v1 = (
     b[i + n] = node[n];
   }
 
-  return buf || stringify(b);
+  return b;
 };
+
+/**
+ * Generate a time-based (version 1) UUID.
+ *
+ * Node ID and clock sequence are random per process unless given in `options`.
+ * Up to 10,000 UUIDs can be generated per millisecond.
+ *
+ * @param options - Override `node`, `clockseq`, `msecs`, `nsecs`, or the random source.
+ * @param buf - If given, the 16 UUID bytes are written here and `buf` is returned.
+ * @param offset - Index in `buf` to start writing at.
+ * @returns The UUID string, or `buf` when one is passed.
+ * @see https://github.com/uuidjs/uuid for API details
+ */
+export function v1(
+  options?: V1Options,
+  buf?: undefined,
+  offset?: number,
+): string;
+export function v1<T extends UUIDBuffer>(
+  options: V1Options | undefined,
+  buf: T,
+  offset?: number,
+): T;
+export function v1<T extends UUIDBuffer>(
+  options?: V1Options,
+  buf?: T,
+  offset?: number,
+): string | T {
+  const bytes = v1Bytes(options || {}, new Uint8Array(16));
+  return buf ? writeBytes(bytes, buf, offset) : unsafeStringify(bytes);
+}

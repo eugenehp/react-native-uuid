@@ -84,9 +84,9 @@ describe('stringify', () => {
         for (let j = 0; j < 16; j++) {
           bytes[j] = Math.floor(Math.random() * 256);
         }
-        // Set version to 4 and variant to reserved
-        bytes[6] = (bytes[6] & 0x0f) | 0x40;
-        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        // Set version to 4 and variant to RFC 9562
+        bytes[6] = 0x40 + (bytes[6] % 0x10);
+        bytes[8] = 0x80 + (bytes[8] % 0x40);
         const result = stringify(bytes);
         expect(result).toMatch(uuidRegex);
       }
@@ -152,5 +152,12 @@ describe('stringify', () => {
 
       expect(current).toBe(original.toLowerCase());
     });
+  });
+
+  it('should throw for bytes that are not a valid UUID', () => {
+    // Version nibble 0 is not a valid UUID version
+    expect(() => stringify(new Uint8Array(16).fill(0x11))).toThrow(
+      'Stringified UUID is invalid',
+    );
   });
 });

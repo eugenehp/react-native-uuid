@@ -6,26 +6,26 @@ import {DNS, URL, OID, X500} from '../utils';
 describe('v3', () => {
   describe('Basic generation with namespace', () => {
     it('should generate valid v3 UUID with DNS namespace', () => {
-      const uuid = v3('example.com', DNS) as string;
+      const uuid = v3('example.com', DNS);
       expect(typeof uuid).toBe('string');
       expect(validate(uuid)).toBe(true);
       expect(version(uuid)).toBe(3);
     });
 
     it('should generate valid v3 UUID with URL namespace', () => {
-      const uuid = v3('https://example.com', URL) as string;
+      const uuid = v3('https://example.com', URL);
       expect(validate(uuid)).toBe(true);
       expect(version(uuid)).toBe(3);
     });
 
     it('should generate valid v3 UUID with OID namespace', () => {
-      const uuid = v3('1.3.6.1', OID) as string;
+      const uuid = v3('1.3.6.1', OID);
       expect(validate(uuid)).toBe(true);
       expect(version(uuid)).toBe(3);
     });
 
     it('should generate valid v3 UUID with X500 namespace', () => {
-      const uuid = v3('cn=example', X500) as string;
+      const uuid = v3('cn=example', X500);
       expect(validate(uuid)).toBe(true);
       expect(version(uuid)).toBe(3);
     });
@@ -33,26 +33,26 @@ describe('v3', () => {
 
   describe('Deterministic generation', () => {
     it('should generate same UUID for same name and namespace', () => {
-      const uuid1 = v3('example.com', DNS) as string;
-      const uuid2 = v3('example.com', DNS) as string;
+      const uuid1 = v3('example.com', DNS);
+      const uuid2 = v3('example.com', DNS);
       expect(uuid1).toBe(uuid2);
     });
 
     it('should generate different UUIDs for different names', () => {
-      const uuid1 = v3('example.com', DNS) as string;
-      const uuid2 = v3('example.org', DNS) as string;
+      const uuid1 = v3('example.com', DNS);
+      const uuid2 = v3('example.org', DNS);
       expect(uuid1).not.toBe(uuid2);
     });
 
     it('should generate different UUIDs for different namespaces', () => {
-      const uuid1 = v3('example.com', DNS) as string;
-      const uuid2 = v3('example.com', URL) as string;
+      const uuid1 = v3('example.com', DNS);
+      const uuid2 = v3('example.com', URL);
       expect(uuid1).not.toBe(uuid2);
     });
 
     it('should generate different UUIDs for different name cases', () => {
-      const uuid1 = v3('example.com', DNS) as string;
-      const uuid2 = v3('EXAMPLE.COM', DNS) as string;
+      const uuid1 = v3('example.com', DNS);
+      const uuid2 = v3('EXAMPLE.COM', DNS);
       expect(uuid1).not.toBe(uuid2);
     });
   });
@@ -61,7 +61,7 @@ describe('v3', () => {
     it('should accept namespace as byte array', () => {
       const {parse} = require('../parse');
       const namespaceBytes = parse(DNS);
-      const uuid = v3('example.com', namespaceBytes) as string;
+      const uuid = v3('example.com', namespaceBytes);
       expect(validate(uuid)).toBe(true);
       expect(version(uuid)).toBe(3);
     });
@@ -69,8 +69,8 @@ describe('v3', () => {
     it('should generate same UUID with byte array namespace as string namespace', () => {
       const {parse} = require('../parse');
       const namespaceBytes = parse(DNS);
-      const uuid1 = v3('example.com', DNS) as string;
-      const uuid2 = v3('example.com', namespaceBytes) as string;
+      const uuid1 = v3('example.com', DNS);
+      const uuid2 = v3('example.com', namespaceBytes);
       expect(uuid1).toBe(uuid2);
     });
   });
@@ -105,24 +105,24 @@ describe('v3', () => {
 
   describe('Various input strings', () => {
     it('should handle empty string', () => {
-      const uuid = v3('', DNS) as string;
+      const uuid = v3('', DNS);
       expect(validate(uuid)).toBe(true);
       expect(version(uuid)).toBe(3);
     });
 
     it('should handle long string', () => {
       const longString = 'a'.repeat(1000);
-      const uuid = v3(longString, DNS) as string;
+      const uuid = v3(longString, DNS);
       expect(validate(uuid)).toBe(true);
     });
 
     it('should handle special characters', () => {
-      const uuid = v3('!@#$%^&*()', DNS) as string;
+      const uuid = v3('!@#$%^&*()', DNS);
       expect(validate(uuid)).toBe(true);
     });
 
     it('should handle unicode characters', () => {
-      const uuid = v3('こんにちは', DNS) as string;
+      const uuid = v3('こんにちは', DNS);
       expect(validate(uuid)).toBe(true);
     });
 
@@ -133,7 +133,7 @@ describe('v3', () => {
         'https://example.com/path?query=value',
       ];
       for (const input of inputs) {
-        const uuid = v3(input, DNS) as string;
+        const uuid = v3(input, DNS);
         expect(validate(uuid)).toBe(true);
       }
     });
@@ -164,7 +164,7 @@ describe('v3', () => {
   describe('Common namespace use cases', () => {
     it('should generate consistent UUIDs for DNS namespace', () => {
       const domains = ['example.com', 'google.com', 'github.com'];
-      const uuids = domains.map(domain => v3(domain, DNS) as string);
+      const uuids = domains.map(domain => v3(domain, DNS));
       // All should be valid
       uuids.forEach(uuid => {
         expect(validate(uuid)).toBe(true);
@@ -180,7 +180,7 @@ describe('v3', () => {
         'https://example.com/path',
         'https://api.example.com',
       ];
-      const uuids = urls.map(url => v3(url, URL) as string);
+      const uuids = urls.map(url => v3(url, URL));
       uuids.forEach(uuid => {
         expect(validate(uuid)).toBe(true);
       });
@@ -190,12 +190,12 @@ describe('v3', () => {
 
   describe('Format validation', () => {
     it('should have version 3 in correct position', () => {
-      const uuid = v3('example.com', DNS) as string;
+      const uuid = v3('example.com', DNS);
       expect(uuid.charAt(14)).toBe('3');
     });
 
     it('should have correct variant bits', () => {
-      const uuid = v3('example.com', DNS) as string;
+      const uuid = v3('example.com', DNS);
       const variantChar = uuid.charAt(19).toLowerCase();
       expect(['8', '9', 'a', 'b']).toContain(variantChar);
     });
@@ -204,7 +204,7 @@ describe('v3', () => {
   describe('Multiple generations', () => {
     it('should generate many valid v3 UUIDs', () => {
       for (let i = 0; i < 20; i++) {
-        const uuid = v3(`test${i}`, DNS) as string;
+        const uuid = v3(`test${i}`, DNS);
         expect(validate(uuid)).toBe(true);
         expect(version(uuid)).toBe(3);
       }
@@ -237,6 +237,23 @@ describe('v3', () => {
       expect(v3('a'.repeat(300000), DNS)).toBe(
         'a88122d3-53c1-3704-b91f-80d74d3a83ef',
       );
+    });
+  });
+
+  describe('Input and output types (parity with uuid)', () => {
+    it('should accept a byte array name', () => {
+      expect(v3([0x61, 0x62, 0x63], DNS)).toBe(v3('abc', DNS));
+      expect(v3(new Uint8Array([0x61, 0x62, 0x63]), DNS)).toBe(v3('abc', DNS));
+    });
+
+    it('should expose DNS and URL namespaces', () => {
+      expect(v3.DNS).toBe(DNS);
+      expect(v3.URL).toBe(URL);
+    });
+
+    it('should write into a Uint8Array', () => {
+      const buf = new Uint8Array(16);
+      expect(v3('abc', DNS, buf)).toBe(buf);
     });
   });
 });

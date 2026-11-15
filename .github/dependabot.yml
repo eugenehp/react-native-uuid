@@ -1,5 +1,7 @@
 version: 2
 updates:
+  # Reviewers come from .github/CODEOWNERS (the `reviewers` option is deprecated)
+
   # Enable version updates for npm dependencies
   - package-ecosystem: 'npm'
     directory: '/'
@@ -8,8 +10,6 @@ updates:
       day: 'monday'
       time: '03:00'
     open-pull-requests-limit: 5
-    reviewers:
-      - 'eugenehp'
     assignees:
       - 'eugenehp'
     labels:
@@ -21,9 +21,6 @@ updates:
       include: 'scope'
     allow:
       - dependency-type: 'all'
-    ignore:
-      # Add ignored dependencies here if needed
-      - dependency-name: 'none'
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: 'github-actions'
@@ -32,8 +29,6 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '03:30'
-    reviewers:
-      - 'eugenehp'
     assignees:
       - 'eugenehp'
     labels:

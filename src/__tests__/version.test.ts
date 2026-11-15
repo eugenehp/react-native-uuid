@@ -37,7 +37,7 @@ describe('version', () => {
     });
 
     it('should throw error for UUID with wrong version bits', () => {
-      expect(() => version('550e8400-e29b-61d4-a716-446655440000')).toThrow(
+      expect(() => version('550e8400-e29b-91d4-a716-446655440000')).toThrow(
         TypeError,
       );
     });
@@ -65,6 +65,18 @@ describe('version', () => {
 
       const uuid4 = '12345678-1234-4123-8123-123456789012';
       expect(version(uuid4)).toBe(4);
+    });
+  });
+
+  describe('RFC 9562 additions', () => {
+    it.each([
+      ['1e1041c7-10b9-662e-9234-0123456789ab', 6],
+      ['017f22e2-79b0-7cc3-98c4-dc0c0c07398f', 7],
+      ['320c3d4d-cc00-875b-8ec9-32d5f69181c0', 8],
+      ['00000000-0000-0000-0000-000000000000', 0],
+      ['ffffffff-ffff-ffff-ffff-ffffffffffff', 15],
+    ])('version(%s) should be %d', (uuid, expected) => {
+      expect(version(uuid)).toBe(expected);
     });
   });
 });

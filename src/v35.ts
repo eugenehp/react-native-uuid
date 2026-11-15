@@ -1,70 +1,56 @@
 /* eslint-disable no-bitwise */
-import {stringify} from './stringify';
-import {parse} from './parse';
-import {validate} from './validate';
-import {stringToBytes, bytesToString} from './utils';
+import {unsafeStringify} from './stringify.js';
+import {parse} from './parse.js';
+import {DNS, URL, UUIDBuffer, stringToBytes, writeBytes} from './utils.js';
 
-export type GenerateUUID = (
-  value: string | Uint8Array,
-  namespace: string | number[],
-  buf?: number[],
-  offset?: number,
-) => string | number[];
+/** A name-based UUID generator ({@link v3} or {@link v5}). */
+export interface GenerateUUID {
+  (
+    value: string | ArrayLike<number>,
+    namespace: string | ArrayLike<number>,
+  ): string;
+  <T extends UUIDBuffer>(
+    value: string | ArrayLike<number>,
+    namespace: string | ArrayLike<number>,
+    buf: T,
+    offset?: number,
+  ): T;
+  /** The DNS namespace UUID. */
+  readonly DNS: string;
+  /** The URL namespace UUID. */
+  readonly URL: string;
+}
 
 export const v35 = (
-  name: string,
   version: number,
-  hashfunc: (s: string) => string,
+  hashfunc: (bytes: Uint8Array) => Uint8Array,
 ): GenerateUUID => {
-  const generateUUID = (
-    value: string | Uint8Array,
-    namespace: string | number[],
-    buf?: number[],
-    offset: number = 0,
-  ): string | number[] => {
-    if (typeof value === 'string') {
-      value = stringToBytes(value);
-    }
+  function generateUUID<T extends UUIDBuffer>(
+    value: string | ArrayLike<number>,
+    namespace: string | ArrayLike<number>,
+    buf?: T,
+    offset?: number,
+  ): string | T {
+    const name = typeof value === 'string' ? stringToBytes(value) : value;
+    const ns = typeof namespace === 'string' ? parse(namespace) : namespace;
 
-    if (typeof namespace === 'string') {
-      if (!validate(namespace)) {
-        throw TypeError('Invalid UUID');
-      }
-      namespace = parse(namespace);
-    }
-
-    if (namespace && namespace.length !== 16) {
+    if (!ns || ns.length !== 16) {
       throw TypeError(
         'Namespace must be array-like (16 iterable integer values, 0-255)',
       );
     }
 
     // Compute hash of namespace and value, Per 4.3
-    // Future: Use spread syntax when supported on all platforms, e.g.
-    // `bytes = hashfunc([...namespace, ... value])`
-    const input = new Uint8Array(16 + value.length);
-    input.set(namespace);
-    input.set(value, namespace.length);
-
-    // hashfunc operates on raw binary strings (one char per byte) and returns
-    // the raw binary digest, so no UTF-8 or hex re-encoding happens here.
-    const digest = hashfunc(bytesToString(input.buffer as ArrayBuffer));
-    const bytes = new Uint8Array(16);
-    for (let i = 0; i < 16; ++i) {
-      bytes[i] = digest.charCodeAt(i);
-    }
+    const input = new Uint8Array(16 + name.length);
+    input.set(ns);
+    input.set(name, 16);
+    const bytes = hashfunc(input);
 
     bytes[6] = (bytes[6] & 0x0f) | version;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
 
-    if (buf) {
-      for (let i = 0; i < 16; ++i) {
-        buf[offset + i] = bytes[i];
-      }
-    }
+    return buf ? writeBytes(bytes, buf, offset) : unsafeStringify(bytes);
+  }
 
-    return buf ? buf : stringify(bytes);
-  };
-
-  return generateUUID;
+  return Object.assign(generateUUID as GenerateUUID, {DNS, URL});
 };

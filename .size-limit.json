@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Default import (all functions)",
+    "path": "dist/esm/index.js",
+    "import": "{ uuid }",
+    "limit": "3 kB"
+  },
+  {
+    "name": "import { v4 }",
+    "path": "dist/esm/index.js",
+    "import": "{ v4 }",
+    "limit": "2 kB"
+  },
+  {
+    "name": "import { v7 }",
+    "path": "dist/esm/index.js",
+    "import": "{ v7 }",
+    "limit": "2.1 kB"
+  },
+  {
+    "name": "React Native entry",
+    "path": "dist/esm/index.native.js",
+    "import": "{ uuid }",
+    "ignore": ["react-native"],
+    "limit": "3.4 kB"
+  }
+]

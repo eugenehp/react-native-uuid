@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -58,65 +56,49 @@ const svgShell = (
   ${body}
 </svg>`;
 
-const makeRnBenchmarkChart = rnJson => {
-  const legendWidth =
-    Math.max(...rnJson.cases.map(c => estimateTextWidth(c, 7.2))) + 70;
-  const width = 1080 + legendWidth;
-  const height = 760;
-  const margin = {top: 90, right: legendWidth, bottom: 100, left: 80};
-  const plotW = width - margin.left - margin.right;
-  const plotH = height - margin.top - margin.bottom;
+const makePerformanceChart = perfJson => {
+  const results = perfJson.results;
+  const labelWidth =
+    Math.max(...results.map(r => estimateTextWidth(r.case, 7))) + 24;
+  const barH = 14;
+  const groupH = barH * 2 + 14;
+  const plotW = 600;
+  const margin = {top: 110, right: 110, bottom: 30, left: labelWidth};
+  const width = margin.left + plotW + margin.right;
+  const height = margin.top + results.length * groupH + margin.bottom;
+  // Each row is scaled to its own maximum: absolute speeds differ by orders of
+  // magnitude between functions, and the comparison within a row is what matters
+  const x = (v, r) => (v / Math.max(r.opsPerSec, r.uuidOpsPerSec)) * plotW;
+  const series = [
+    {key: 'opsPerSec', name: 'react-native-uuid', color: palette[0]},
+    {
+      key: 'uuidOpsPerSec',
+      name: `uuid@${perfJson.uuidVersion}`,
+      color: palette[1],
+    },
+  ];
 
-  const versions = rnJson.matrix.map(m => m.reactNative);
-  const cases = rnJson.cases;
-  const maxY = Math.max(
-    ...rnJson.matrix.flatMap(m => m.results.map(r => r.opsPerSec)),
-  );
+  let body = `<text class="title" x="24" y="40">Performance (ops/sec, Node.js ${esc(perfJson.node)})</text>`;
+  body += `<text class="note" x="24" y="60">Best of ${perfJson.runs} runs; each row scaled to its fastest result. Generated from ./benchmarks/results/performance-benchmark.json</text>`;
 
-  const x = i => margin.left + (i * plotW) / (versions.length - 1);
-  const y = v => margin.top + plotH - (v / maxY) * plotH;
-
-  let body = `<text class="title" x="${margin.left}" y="44">React Native Benchmark (ops/sec by RN version)</text>`;
-  body += `<text class="note" x="${margin.left}" y="64">Generated from ./benchmarks/results/rn-version-benchmark.json</text>`;
-  body += `<text class="label" text-anchor="middle" transform="translate(20,${margin.top + plotH / 2}) rotate(-90)">ops/sec</text>`;
-
-  for (let i = 0; i <= 5; i += 1) {
-    const gy = margin.top + (i * plotH) / 5;
-    const gv = Math.round(maxY - (i * maxY) / 5).toLocaleString('en-US');
-    body += `<line class="grid" x1="${margin.left}" y1="${gy}" x2="${margin.left + plotW}" y2="${gy}" />`;
-    body += `<text class="axis" x="${margin.left - 10}" y="${gy + 4}" text-anchor="end">${gv}</text>`;
-  }
-
-  body += `<line stroke="#111827" stroke-width="1.5" x1="${margin.left}" y1="${margin.top + plotH}" x2="${margin.left + plotW}" y2="${margin.top + plotH}" />`;
-  body += `<line stroke="#111827" stroke-width="1.5" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotH}" />`;
-
-  versions.forEach((v, i) => {
-    body += `<text class="axis" x="${x(i)}" y="${margin.top + plotH + 24}" text-anchor="middle">${esc(v)}</text>`;
+  series.forEach((s, i) => {
+    const lx = 24 + i * 200;
+    body += `<rect x="${lx}" y="74" width="14" height="14" fill="${s.color}" />`;
+    body += `<text class="legend" x="${lx + 20}" y="86">${esc(s.name)}</text>`;
   });
 
-  cases.forEach((caseName, caseIndex) => {
-    const color = palette[caseIndex % palette.length];
-    const points = rnJson.matrix
-      .map((m, i) => {
-        const match = m.results.find(r => r.case === caseName);
-        return `${x(i)},${y(match.opsPerSec)}`;
-      })
-      .join(' ');
-
-    body += `<polyline fill="none" stroke="${color}" stroke-width="2.2" points="${points}" />`;
-
-    rnJson.matrix.forEach((m, i) => {
-      const match = m.results.find(r => r.case === caseName);
-      body += `<circle cx="${x(i)}" cy="${y(match.opsPerSec)}" r="3" fill="${color}" />`;
+  results.forEach((r, i) => {
+    const gy = margin.top + i * groupH;
+    body += `<text class="axis" x="${margin.left - 12}" y="${gy + barH + 4}" text-anchor="end">${esc(r.case)}</text>`;
+    series.forEach((s, j) => {
+      const by = gy + j * barH;
+      const w = Math.max(1, x(r[s.key], r));
+      body += `<rect x="${margin.left}" y="${by}" width="${w}" height="${barH - 2}" fill="${s.color}" />`;
+      body += `<text class="label" x="${margin.left + w + 6}" y="${by + barH - 4}">${Number(r[s.key]).toLocaleString('en-US')}</text>`;
     });
-
-    const lx = width - margin.right + 20;
-    const ly = margin.top + caseIndex * 24;
-    body += `<line x1="${lx}" y1="${ly}" x2="${lx + 20}" y2="${ly}" stroke="${color}" stroke-width="3" />`;
-    body += `<text class="legend" x="${lx + 28}" y="${ly + 4}">${esc(caseName)}</text>`;
   });
 
-  return svgShell(width, height, body, 'React Native benchmark line chart');
+  return svgShell(width, height, body, 'Performance bar chart');
 };
 
 const makeSecurityChart = securityJson => {
@@ -225,10 +207,10 @@ const makeTestChart = testJson => {
   return svgShell(width, height, body, 'Test results bar chart');
 };
 
-const rn = readJson('rn-version-benchmark.json');
+const perf = readJson('performance-benchmark.json');
 const security = readJson('security-benchmark.json');
 const test = readJson('test-results.json');
 
-writeFile('rn-benchmark-chart.svg', makeRnBenchmarkChart(rn));
+writeFile('performance-chart.svg', makePerformanceChart(perf));
 writeFile('security-benchmark-chart.svg', makeSecurityChart(security));
 writeFile('test-results-chart.svg', makeTestChart(test));

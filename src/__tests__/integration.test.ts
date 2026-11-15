@@ -1,4 +1,5 @@
 import uuid from '../index';
+import * as named from '../index';
 import {v1} from '../v1';
 import {v3} from '../v3';
 import {v4} from '../v4';
@@ -22,6 +23,40 @@ describe('Integration Tests', () => {
       expect(uuid.version).toBeDefined();
     });
 
+    it('should expose the same members as named exports', () => {
+      const keys = Object.keys(uuid).sort();
+      expect(keys).toEqual(
+        [
+          'DNS',
+          'MAX',
+          'NIL',
+          'OID',
+          'URL',
+          'X500',
+          'parse',
+          'randomSource',
+          'rng',
+          'stringify',
+          'unparse',
+          'v1',
+          'v1ToV6',
+          'v3',
+          'v4',
+          'v5',
+          'v6',
+          'v6ToV1',
+          'v7',
+          'validate',
+          'version',
+        ].sort(),
+      );
+      for (const key of keys) {
+        expect(named[key as keyof typeof named]).toBe(
+          uuid[key as keyof typeof uuid],
+        );
+      }
+    });
+
     it('should export namespace constants', () => {
       expect(uuid.DNS).toBe(DNS);
       expect(uuid.URL).toBe(URL);
@@ -31,7 +66,7 @@ describe('Integration Tests', () => {
     });
 
     it('should use exported functions correctly', () => {
-      const uuidStr = uuid.v4() as string;
+      const uuidStr = uuid.v4();
       expect(uuid.validate(uuidStr)).toBe(true);
       expect(uuid.version(uuidStr)).toBe(4);
     });
@@ -39,25 +74,25 @@ describe('Integration Tests', () => {
 
   describe('UUID generation and validation workflow', () => {
     it('should generate and validate v1 UUID', () => {
-      const uuidStr = uuid.v1() as string;
+      const uuidStr = uuid.v1();
       expect(uuid.validate(uuidStr)).toBe(true);
       expect(uuid.version(uuidStr)).toBe(1);
     });
 
     it('should generate and validate v4 UUID', () => {
-      const uuidStr = uuid.v4() as string;
+      const uuidStr = uuid.v4();
       expect(uuid.validate(uuidStr)).toBe(true);
       expect(uuid.version(uuidStr)).toBe(4);
     });
 
     it('should generate and validate v3 UUID', () => {
-      const uuidStr = uuid.v3('example.com', uuid.DNS) as string;
+      const uuidStr = uuid.v3('example.com', uuid.DNS);
       expect(uuid.validate(uuidStr)).toBe(true);
       expect(uuid.version(uuidStr)).toBe(3);
     });
 
     it('should generate and validate v5 UUID', () => {
-      const uuidStr = uuid.v5('example.com', uuid.DNS) as string;
+      const uuidStr = uuid.v5('example.com', uuid.DNS);
       expect(uuid.validate(uuidStr)).toBe(true);
       expect(uuid.version(uuidStr)).toBe(5);
     });
@@ -65,16 +100,16 @@ describe('Integration Tests', () => {
 
   describe('Parse and stringify round-trip', () => {
     it('should parse and stringify v4 UUID', () => {
-      const original = uuid.v4() as string;
+      const original = uuid.v4();
       const parsed = uuid.parse(original);
-      const stringified = uuid.unparse(parsed as any) as string;
+      const stringified = uuid.unparse(parsed);
       expect(stringified.toLowerCase()).toBe(original.toLowerCase());
     });
 
     it('should parse and stringify v1 UUID', () => {
-      const original = uuid.v1() as string;
+      const original = uuid.v1();
       const parsed = uuid.parse(original);
-      const stringified = uuid.unparse(parsed as any) as string;
+      const stringified = uuid.unparse(parsed);
       expect(stringified.toLowerCase()).toBe(original.toLowerCase());
     });
 
@@ -101,30 +136,30 @@ describe('Integration Tests', () => {
     });
 
     it('should generate consistent v3 UUIDs for same input', () => {
-      const uuid1 = uuid.v3('example.com', uuid.DNS) as string;
-      const uuid2 = uuid.v3('example.com', uuid.DNS) as string;
+      const uuid1 = uuid.v3('example.com', uuid.DNS);
+      const uuid2 = uuid.v3('example.com', uuid.DNS);
       expect(uuid1).toBe(uuid2);
     });
 
     it('should generate consistent v5 UUIDs for same input', () => {
-      const uuid1 = uuid.v5('example.com', uuid.DNS) as string;
-      const uuid2 = uuid.v5('example.com', uuid.DNS) as string;
+      const uuid1 = uuid.v5('example.com', uuid.DNS);
+      const uuid2 = uuid.v5('example.com', uuid.DNS);
       expect(uuid1).toBe(uuid2);
     });
 
     it('should generate different UUIDs for different inputs', () => {
-      const uuid1 = uuid.v3('example.com', uuid.DNS) as string;
-      const uuid2 = uuid.v3('example.org', uuid.DNS) as string;
+      const uuid1 = uuid.v3('example.com', uuid.DNS);
+      const uuid2 = uuid.v3('example.org', uuid.DNS);
       expect(uuid1).not.toBe(uuid2);
     });
   });
 
   describe('Mixed version operations', () => {
     it('should handle different UUID versions', () => {
-      const v1_uuid = uuid.v1() as string;
-      const v3_uuid = uuid.v3('test', uuid.DNS) as string;
-      const v4_uuid = uuid.v4() as string;
-      const v5_uuid = uuid.v5('test', uuid.DNS) as string;
+      const v1_uuid = uuid.v1();
+      const v3_uuid = uuid.v3('test', uuid.DNS);
+      const v4_uuid = uuid.v4();
+      const v5_uuid = uuid.v5('test', uuid.DNS);
 
       expect(uuid.version(v1_uuid)).toBe(1);
       expect(uuid.version(v3_uuid)).toBe(3);
@@ -134,10 +169,10 @@ describe('Integration Tests', () => {
 
     it('should validate all version types', () => {
       const uuids = [
-        uuid.v1() as string,
-        uuid.v3('test', uuid.DNS) as string,
-        uuid.v4() as string,
-        uuid.v5('test', uuid.DNS) as string,
+        uuid.v1(),
+        uuid.v3('test', uuid.DNS),
+        uuid.v4(),
+        uuid.v5('test', uuid.DNS),
       ];
 
       uuids.forEach(u => {
@@ -186,7 +221,7 @@ describe('Integration Tests', () => {
         'not-a-uuid',
         '123',
         'zzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz',
-        '550e8400-e29b-61d4-a716-446655440000', // wrong version
+        '550e8400-e29b-91d4-a716-446655440000', // wrong version
       ];
 
       invalidUUIDs.forEach(u => {
@@ -214,8 +249,8 @@ describe('Integration Tests', () => {
       ];
 
       for (const {ns, name} of namespaces) {
-        const v3_uuid = uuid.v3(`test-${name}`, ns) as string;
-        const v5_uuid = uuid.v5(`test-${name}`, ns) as string;
+        const v3_uuid = uuid.v3(`test-${name}`, ns);
+        const v5_uuid = uuid.v5(`test-${name}`, ns);
 
         expect(uuid.validate(v3_uuid)).toBe(true);
         expect(uuid.validate(v5_uuid)).toBe(true);
@@ -226,8 +261,8 @@ describe('Integration Tests', () => {
 
     it('should handle namespace as byte array', () => {
       const nsBytes = uuid.parse(uuid.DNS);
-      const v3_uuid = uuid.v3('test', nsBytes) as string;
-      const v5_uuid = uuid.v5('test', nsBytes) as string;
+      const v3_uuid = uuid.v3('test', nsBytes);
+      const v5_uuid = uuid.v5('test', nsBytes);
 
       expect(uuid.validate(v3_uuid)).toBe(true);
       expect(uuid.validate(v5_uuid)).toBe(true);
@@ -237,8 +272,8 @@ describe('Integration Tests', () => {
   describe('Use case scenarios', () => {
     it('should generate consistent IDs for database records', () => {
       const userId = 'user123';
-      const recordId = uuid.v5(userId, uuid.DNS) as string;
-      const recordId2 = uuid.v5(userId, uuid.DNS) as string;
+      const recordId = uuid.v5(userId, uuid.DNS);
+      const recordId2 = uuid.v5(userId, uuid.DNS);
 
       expect(recordId).toBe(recordId2);
       expect(uuid.validate(recordId)).toBe(true);
@@ -290,7 +325,7 @@ describe('Integration Tests', () => {
     });
 
     it('should parse/stringify quickly', () => {
-      const testUuid = uuid.v4() as string;
+      const testUuid = uuid.v4();
       const start = Date.now();
       for (let i = 0; i < 1000; i++) {
         const parsed = uuid.parse(testUuid);

@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-03-20T21:05:13.478Z",
+  "generatedAt": "2026-11-15T00:46:38.165Z",
   "machine": {
     "platform": "darwin",
     "arch": "arm64",
-    "node": "v25.8.1"
+    "node": "v26.0.0"
   },
   "config": {
     "uuidSamples": 100000,
@@ -24,17 +24,17 @@
     "crossBatchOverlap": 0,
     "monobit": {
       "totalBits": 12200000,
-      "ones": 6100040,
-      "pi": 0.5000032786885246,
-      "zScore": 0.022903933372554728
+      "ones": 6101818,
+      "pi": 0.5001490163934427,
+      "zScore": 1.0409837717826125
     },
     "runs": {
-      "runs": 6097069,
-      "expectedRuns": 6099999.999737705,
-      "zScore": 1.6782856365386973
+      "runs": 6097749,
+      "expectedRuns": 6099999.458176394,
+      "zScore": 1.288608770516866
     },
     "rngChiSquare": {
-      "value": 270.66544,
+      "value": 291.80592000000007,
       "bins": 256,
       "expectedPerBin": 12500
     },
@@ -59,19 +59,19 @@
     },
     {
       "name": "Monobit z-score within bound",
-      "value": 0.0229,
+      "value": 1.041,
       "threshold": 4,
       "pass": true
     },
     {
       "name": "Runs z-score within bound",
-      "value": 1.6783,
+      "value": 1.2886,
       "threshold": 4,
       "pass": true
     },
     {
       "name": "RNG chi-square within bound",
-      "value": 270.6654,
+      "value": 291.8059,
       "threshold": 420,
       "pass": true
     },

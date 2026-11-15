@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-11-15T00:56:00.172Z",
+  "node": "v26.0.0",
+  "machine": {
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "iterations": 200000,
+  "runs": 7,
+  "uuidVersion": "14.0.3",
+  "results": [
+    {
+      "case": "v1()",
+      "opsPerSec": 4093611,
+      "uuidOpsPerSec": 599707,
+      "ratio": 6.83
+    },
+    {
+      "case": "v3(name, DNS)",
+      "opsPerSec": 948068,
+      "uuidOpsPerSec": 479856,
+      "ratio": 1.98
+    },
+    {
+      "case": "v4()",
+      "opsPerSec": 10034032,
+      "uuidOpsPerSec": 7219793,
+      "ratio": 1.39
+    },
+    {
+      "case": "v4({}) (JS path)",
+      "opsPerSec": 1941020,
+      "uuidOpsPerSec": 953805,
+      "ratio": 2.04
+    },
+    {
+      "case": "v5(name, DNS)",
+      "opsPerSec": 705070,
+      "uuidOpsPerSec": 540528,
+      "ratio": 1.3
+    },
+    {
+      "case": "v6()",
+      "opsPerSec": 2028092,
+      "uuidOpsPerSec": 816994,
+      "ratio": 2.48
+    },
+    {
+      "case": "v7()",
+      "opsPerSec": 1699905,
+      "uuidOpsPerSec": 729792,
+      "ratio": 2.33
+    },
+    {
+      "case": "validate(sample)",
+      "opsPerSec": 16829173,
+      "uuidOpsPerSec": 18252062,
+      "ratio": 0.92
+    },
+    {
+      "case": "parse(sample)",
+      "opsPerSec": 3355768,
+      "uuidOpsPerSec": 3333630,
+      "ratio": 1.01
+    },
+    {
+      "case": "stringify(parse(sample))",
+      "opsPerSec": 1578673,
+      "uuidOpsPerSec": 1742130,
+      "ratio": 0.91
+    }
+  ]
+}

@@ -1,28 +1,63 @@
 {
   "name": "react-native-uuid",
-  "version": "2.0.4",
-  "description": "react-native-uuid is a zero-dependency TypeScript implementation of RFC4122.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "3.0.0",
+  "description": "Zero-dependency TypeScript UUID generator (RFC 9562: v1, v3, v4, v5, v6, v7) for React Native, browsers and Node.js.",
+  "type": "commonjs",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "react-native": "dist/cjs/index.native.js",
+  "exports": {
+    ".": {
+      "react-native": {
+        "types": "./dist/cjs/index.native.d.ts",
+        "default": "./dist/cjs/index.native.js"
+      },
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./dist/*/index.native.js",
+    "./dist/*/nativeRandom.js"
+  ],
+  "files": [
+    "dist",
+    "ios",
+    "android/build.gradle",
+    "android/src",
+    "react-native-uuid.podspec",
+    "!**/__tests__",
+    "!**/*.map"
+  ],
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "node scripts/build.js",
     "prepublishOnly": "npm run build",
-    "prepare": "husky install",
+    "prepare": "husky",
     "test": "jest",
-    "bench:rn": "node scripts/benchmark-rn-versions.js",
+    "bench:perf": "node scripts/benchmark.js",
     "bench:security": "node scripts/security-benchmark.js",
     "bench:figures": "node scripts/generate-benchmark-figures.js",
-    "bench:all": "npm run bench:rn && npm run bench:security && npm run bench:figures",
+    "bench:all": "npm run bench:perf && npm run bench:security && npm run bench:figures",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "docs": "typedoc ./src --entryDocument .",
-    "prettier:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json}\" --no-error-on-unmatched-pattern",
-    "prettier:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json}\" --no-error-on-unmatched-pattern",
-    "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx ./"
+    "docs": "typedoc",
+    "prettier:write": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "lint": "tsc --noEmit && eslint .",
+    "check:package": "npm run build && publint --strict && attw --pack .",
+    "size": "size-limit"
   },
   "repository": {
     "type": "git",
@@ -30,8 +65,13 @@
   },
   "keywords": [
     "uuid",
+    "guid",
     "rfc4122",
+    "rfc9562",
+    "uuidv4",
+    "uuidv7",
     "react-native",
+    "expo",
     "reactivelions"
   ],
   "author": "Eugene Hauptmann",
@@ -40,32 +80,50 @@
     "url": "https://github.com/eugenehp/react-native-uuid/issues"
   },
   "homepage": "https://github.com/eugenehp/react-native-uuid#readme",
+  "peerDependencies": {
+    "react-native": ">=0.74.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "@babel/core": "^7.24.0",
-    "@babel/runtime": "^7.24.0",
-    "@react-native-community/eslint-config": "^3.2.0",
-    "@types/jest": "^29.5.0",
-    "babel-jest": "^29.7.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-prettier": "^5.5.5",
-    "husky": "^9.0.0",
-    "jest": "^29.7.0",
-    "lint-staged": "^15.2.0",
-    "metro-react-native-babel-preset": "^0.77.0",
-    "prettier": "^3.2.0",
-    "react-test-renderer": "^17.0.2",
-    "ts-jest": "^29.4.6",
-    "typedoc": "^0.25.4",
-    "typedoc-plugin-markdown": "^3.17.1",
-    "typescript": "^5.3.0"
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@eslint/js": "^10.0.1",
+    "@size-limit/preset-small-lib": "^14.3.0",
+    "@types/jest": "^30.0.0",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.7",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "jest": "^30.5.2",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.10.1",
+    "publint": "^0.3.25",
+    "size-limit": "^14.3.0",
+    "ts-jest": "^29.4.15",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.14.1",
+    "typescript": "~5.9",
+    "typescript-eslint": "^8.72.2",
+    "uuid": "^14.0.3"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "*.{js,ts}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md}": [
+    "*.{json,md,yml}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "glob": "^14.0.6",
+    "minimatch": "^11.0.8",
+    "typedoc": {
+      "minimatch": "^10.2.6"
+    }
   }
 }

@@ -12,23 +12,23 @@ console.log('Random UUID (v4):', uuid.v4());
 
 // Example 2: Generate a time-based UUID (v1)
 console.log('Time-based UUID (v1):', uuid.v1());
-// Output: Time-based UUID (v1): 550e8400-e29b-41d4-a716-446655440000
+// Output: Time-based UUID (v1): 55b68000-dfbe-11f1-9234-0123456789ab
 
 // Example 3: Generate a deterministic UUID from a namespace and name (v3)
 const v3UUID = uuid.v3('hello', uuid.DNS);
 console.log('DNS Namespace UUID (v3):', v3UUID);
-// Output: DNS Namespace UUID (v3): 5df41881-3c2f-36d7-b546-49953ef87ae0
+// Output: DNS Namespace UUID (v3): 0bacede4-4014-3f9d-b720-173f68a1c933
 
 // Example 4: Generate a deterministic UUID using SHA1 (v5)
 const v5UUID = uuid.v5('hello', uuid.DNS);
 console.log('DNS Namespace UUID (v5):', v5UUID);
-// Output: DNS Namespace UUID (v5): 9d4e8b3a-2c8e-5e7a-9d2e-8b3a2c8e5e7a
+// Output: DNS Namespace UUID (v5): 9342d47a-1bab-5709-9869-c840b2eac501
 
 // Example 5: Parse a UUID string to bytes
 const uuidString = '550e8400-e29b-41d4-a716-446655440000';
 const bytes = uuid.parse(uuidString);
 console.log('UUID bytes:', bytes);
-// Output: UUID bytes: Uint8Array(16) [ 85, 14, 132, 0, 226, 155, 65, 212, 167, 22, 68, 102, 85, 68, 0, 0 ]
+// Output: UUID bytes: [ 85, 14, 132, 0, 226, 155, 65, 212, 167, 22, 68, 102, 85, 68, 0, 0 ]
 
 // Example 6: Convert UUID bytes back to string
 const byteArray = [

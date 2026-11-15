@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
+/* eslint-disable no-bitwise */
 
 const fs = require('node:fs');
 const path = require('node:path');
 
-const uuid = require('../dist/index.js').default;
-const {rng} = require('../dist/rng.js');
+const uuid = require('../dist/cjs/index.js').default;
+const {rng} = require('../dist/cjs/rng.js');
 
 const CONFIG = {
   uuidSamples: 100000,
@@ -20,16 +20,6 @@ const THRESHOLDS = {
   runsMaxZScore: 4,
   rngChiSquareMax: 420,
   malformedCrashCountMax: 0,
-};
-
-const countBits = n => {
-  let x = n;
-  let c = 0;
-  while (x) {
-    x &= x - 1;
-    c += 1;
-  }
-  return c;
 };
 
 const variableBitsFromUuidBytes = bytes => {
@@ -169,7 +159,11 @@ const run = () => {
       if (uuid.validate(candidate)) malformedValidatedAsTrue += 1;
       uuid.parse(candidate);
     } catch (error) {
-      malformedCrashes += 1;
+      // parse() rejects invalid input with TypeError('Invalid UUID'); any
+      // other error is a crash
+      const rejected =
+        error instanceof TypeError && error.message === 'Invalid UUID';
+      if (!rejected) malformedCrashes += 1;
     }
   }
 

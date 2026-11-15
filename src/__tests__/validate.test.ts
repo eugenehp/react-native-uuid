@@ -57,7 +57,7 @@ describe('validate', () => {
     });
 
     it('should reject UUID with wrong version bits', () => {
-      expect(validate('550e8400-e29b-61d4-a716-446655440000')).toBe(false);
+      expect(validate('550e8400-e29b-91d4-a716-446655440000')).toBe(false);
     });
 
     it('should reject UUID with wrong variant bits', () => {
@@ -98,6 +98,17 @@ describe('validate', () => {
 
     it('should reject string with internal spaces', () => {
       expect(validate('550e8400-e29b-41d4-a716-44665544 000')).toBe(false);
+    });
+  });
+
+  describe('RFC 9562 additions', () => {
+    it.each([
+      ['v6', '1e1041c7-10b9-662e-9234-0123456789ab'],
+      ['v7', '017f22e2-79b0-7cc3-98c4-dc0c0c07398f'],
+      ['v8', '320c3d4d-cc00-875b-8ec9-32d5f69181c0'],
+      ['max', 'ffffffff-ffff-ffff-ffff-ffffffffffff'],
+    ])('should accept a %s UUID', (_label, uuid) => {
+      expect(validate(uuid)).toBe(true);
     });
   });
 });

@@ -1,6 +1,7 @@
 # Security Policy
 
 ## Coordinated Vulnerability Disclosure Policy
+
 To protect our users and reduce harm to the community, we ask security researchers to keep vulnerabilities and communications around vulnerability submissions private and confidential until a patch is developed. In addition to this, we ask that you:
 
 - Allow us a reasonable amount of time to correct or address security vulnerabilities.
@@ -11,6 +12,7 @@ To protect our users and reduce harm to the community, we ask security researche
 Please avoid filing security issues in our public repositories as this method of contact fully discloses security bugs to friends and adversaries alike, and makes it difficult for us to reduce harm for our users and community.
 
 ## Vulnerability Disclosure Process
+
 Once we receive a vulnerability report, we will take these steps to address it:
 
 - react-native-uuid will confirm receipt of the vulnerability report within 3 business days. The timing of our response may depend on when a report is submitted. Our daily operations are distributed in time zones across the globe, and response times may vary. If you have not received a response to a vulnerability report from us within 3 business days, we encourage you to follow up with us again for a response. We have a small team and we may not be able to meet the same response times of larger teams with more resources.
@@ -22,12 +24,12 @@ react-native-uuid will publicly release the security patch for the vulnerability
 
 ## Supported Versions
 
-We currently support only 2.0.x release.
+We currently support only 3.0.x release.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.0.x   | :white_check_mark: |
-| < 2.0.0 | :x:                |
+| 3.0.x   | :white_check_mark: |
+| < 3.0.0 | :x:                |
 
 ## Reporting a Vulnerability
 

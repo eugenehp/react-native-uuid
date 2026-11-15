@@ -10,7 +10,7 @@
 # Configuration files
 tsconfig.json     @eugenehp
 *.config.js       @eugenehp
-.eslintrc.js      @eugenehp
+eslint.config.js  @eugenehp
 .prettierrc.js    @eugenehp
 
 # CI/CD

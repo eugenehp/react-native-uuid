@@ -191,4 +191,51 @@ describe('v4', () => {
       expect(rng).not.toHaveBeenCalled();
     });
   });
+
+  describe('Random input handling', () => {
+    it('should not modify caller-supplied random bytes', () => {
+      const random = new Array(16).fill(0xff);
+      v4({random});
+      expect(random).toEqual(new Array(16).fill(0xff));
+    });
+
+    it('should throw if fewer than 16 random bytes are given', () => {
+      expect(() => v4({random: [1, 2, 3]})).toThrow(
+        'Random bytes length must be >= 16',
+      );
+    });
+
+    it('should throw when the buffer is too small', () => {
+      expect(() => v4({}, new Uint8Array(10))).toThrow(RangeError);
+    });
+  });
+
+  describe('crypto.randomUUID fast path', () => {
+    const original = Object.getOwnPropertyDescriptor(globalThis, 'crypto');
+    const randomUUID = jest.fn(() => '11111111-1111-4111-8111-111111111111');
+
+    beforeEach(() => {
+      randomUUID.mockClear();
+      Object.defineProperty(globalThis, 'crypto', {
+        value: {randomUUID, getRandomValues: (a: Uint8Array) => a.fill(0)},
+        configurable: true,
+      });
+    });
+
+    afterEach(() => {
+      if (original) {
+        Object.defineProperty(globalThis, 'crypto', original);
+      }
+    });
+
+    it('should use crypto.randomUUID without options', () => {
+      expect(v4()).toBe('11111111-1111-4111-8111-111111111111');
+    });
+
+    it('should not use it when options or a buffer are given', () => {
+      expect(v4({})).toBe('00000000-0000-4000-8000-000000000000');
+      v4(undefined, new Uint8Array(16));
+      expect(randomUUID).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -1,0 +1,5 @@
+dist/
+docs/
+coverage/
+benchmarks/results/
+package-lock.json

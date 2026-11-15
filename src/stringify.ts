@@ -1,19 +1,17 @@
-import {validate} from './validate';
+import {byteToHex} from './utils.js';
+import {validate} from './validate.js';
 
 /**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ * Convert 16 bytes to a UUID string without validating it.
+ * @internal
  */
-const byteToHex: string[] = [];
-
-for (let i = 0; i < 256; ++i) {
-  byteToHex.push((i + 0x100).toString(16).substr(1));
-}
-
-export const stringify = (arr: Uint8Array, offset = 0): string => {
+export const unsafeStringify = (
+  arr: ArrayLike<number>,
+  offset: number = 0,
+): string =>
   // Note: Be careful editing this code!  It's been tuned for performance
   // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
-  const uuid = (
+  (
     byteToHex[arr[offset + 0]] +
     byteToHex[arr[offset + 1]] +
     byteToHex[arr[offset + 2]] +
@@ -35,6 +33,19 @@ export const stringify = (arr: Uint8Array, offset = 0): string => {
     byteToHex[arr[offset + 14]] +
     byteToHex[arr[offset + 15]]
   ).toLowerCase();
+
+/**
+ * Convert 16 UUID bytes into a UUID string.
+ *
+ * @param offset - Index in `arr` to start reading from.
+ * @throws TypeError if the bytes don't form a valid UUID (e.g. values outside
+ * 0-255, or invalid version/variant bits).
+ */
+export const stringify = (
+  arr: ArrayLike<number>,
+  offset: number = 0,
+): string => {
+  const uuid = unsafeStringify(arr, offset);
 
   // Consistency check for valid UUID.  If this throws, it's likely due to one
   // of the following:

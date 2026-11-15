@@ -1,0 +1,15 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryPoints": ["./src/index.ts"],
+  "excludeInternal": true,
+  "readme": "none",
+  "entryFileName": "modules.md",
+  "outputFileStrategy": "members",
+  "gitRevision": "v3.0.0",
+  "out": "docs",
+  "cleanOutputDir": true,
+  "disableGit": true,
+  "sourceLinkTemplate": "https://github.com/eugenehp/react-native-uuid/blob/{gitRevision}/src/{path}#L{line}",
+  "basePath": "."
+}

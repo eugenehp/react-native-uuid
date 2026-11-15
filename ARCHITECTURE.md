@@ -8,286 +8,114 @@ react-native-uuid is a lightweight TypeScript library that brings UUID (Universa
 
 1. **Simplicity** - Minimal API surface with sensible defaults
 2. **Compatibility** - Works across different JavaScript environments (React Native, Node.js, Browsers)
-3. **Standards Compliance** - Full RFC 4122 implementation
-
-## Module Structure
+3. **Standards Compliance** - RFC 9562 (formerly RFC 4122), ## Module Structure
 
 ```
 src/
-├── index.ts           # Main entry point and public API
-├── v1.ts              # Time-based UUID generation
-├── v3.ts              # MD5 name-based UUID generation
-├── v4.ts              # Random UUID generation
-├── v5.ts              # SHA1 name-based UUID generation
-├── validate.ts        # UUID validation logic
-├── parse.ts           # UUID string parsing
-├── stringify.ts       # UUID bytes to string conversion
-├── unparse.ts         # Alias for stringify
-├── utils.ts           # Shared utility functions
-├── rng.ts             # Random number generator interface
-├── regex.ts           # UUID regex pattern
-├── md5.ts             # MD5 hashing algorithm
-├── sha1.ts            # SHA1 hashing algorithm
-├── version.ts         # Version extraction utility
-└── v35.ts             # Shared logic for v3 and v5
+├── index.ts          # Public API: named exports + default `uuid` object
+├── index.native.ts   # React Native entry: registers the native random source, re-exports index
+├── nativeRandom.ts   # Pooled wrapper around the RNUUIDRandom native module
+├── rng.ts            # Random bytes: crypto -> native -> Math.random
+├── v1.ts             # Time-based (Gregorian epoch)
+├── v3.ts, v5.ts      # Name-based (MD5 / SHA-1), built on v35.ts
+├── v35.ts            # Shared v3/v5 logic
+├── v4.ts             # Random
+├── v6.ts             # Time-based, reordered (v1 fields, sortable)
+├── v7.ts             # Unix-epoch time-based, sortable, monotonic
+├── v1ToV6.ts, v6ToV1.ts
+├── md5.ts, sha1.ts   # Hashes operating on bytes
+├── parse.ts          # String -> bytes (validating)
+├── stringify.ts      # Bytes -> string (validating) and unsafeStringify
+├── unparse.ts        # Bytes -> string (not validating, legacy API)
+├── validate.ts, version.ts, regex.ts
+└── utils.ts          # Hex tables, namespaces, UTF-8 encoding, buffer writes
+
+ios/RNUUIDRandom.m                      # SecRandomCopyBytes
+android/src/main/java/.../RNUUIDRandom* # SecureRandom
+react-native-uuid.podspec
 ```
 
-## Core Components
+## Package Layout and Entry Points
 
-### 1. Entry Point (`index.ts`)
+`npm run build` (`scripts/build.js`) compiles `src/` twice:
 
-The main entry point exports the public API:
+- `dist/cjs/`: CommonJS, used by `require`
+- `dist/esm/`: ES modules, used by `import`
 
-```typescript
-export default {
-  v1,
-  v3,
-  v4,
-  v5,
-  parse,
-  stringify,
-  validate,
-  version,
-};
-```
+Each has its own `.d.ts` files and a `package.json` declaring its module type, so TypeScript resolves the right types in every mode (checked by `npm run check:package`).
 
-This provides a clean, modular interface where consumers can either:
-- Use default exports: `uuid.v4()`
-- Import named exports: `import { v4 } from 'react-native-uuid'`
+The `exports` map picks the entry point:
 
-### 2. Version-Specific Generators
+| Condition      | Entry                      | Used by                |
+| -------------- | -------------------------- | ---------------------- |
+| `react-native` | `dist/cjs/index.native.js` | Metro (React Native)   |
+| `import`       | `dist/esm/index.js`        | Node.js ESM, bundlers  |
+| `require`      | `dist/cjs/index.js`        | Node.js CommonJS, Jest |
 
-Each UUID version (v1, v3, v4, v5) is implemented in its own module with specific characteristics:
+The top-level `react-native` field points to the same native entry for older Metro versions without `exports` support. The React Native entry is CommonJS so it works in Jest setups that don't transform `node_modules`.
 
-#### Version 1 (Time-based)
-- **File**: `v1.ts`
-- **Use Case**: Sequential IDs based on machine MAC and timestamp
-- **Characteristics**: Predictable, sortable, reveals timestamp information
-- **Inputs**: Optional node identifier and clock sequence
+Relative imports in `src/` use `.js` extensions, which Node.js ESM requires. Jest maps them back to `.ts` (`jest.config.js`).
 
-```typescript
-export function v1(options?, buffer?, offset?): string
-```
+## Generators
 
-#### Version 3 (MD5 Name-based)
-- **File**: `v3.ts`
-- **Use Case**: Deterministic IDs from names using MD5 hashing
-- **Characteristics**: Same input always produces same UUID
-- **Inputs**: Namespace UUID + name string
+All generators share the signature `(options?, buf?, offset?)` (`v3`/`v5`: `(name, namespace, buf?, offset?)`). Overloads make the return type `string` without `buf`, and the buffer's own type with it. `buf` may be a `number[]` (grows as needed) or `Uint8Array` (must fit, else `RangeError`).
 
-#### Version 4 (Random)
-- **File**: `v4.ts`
-- **Use Case**: Random IDs for most general purpose applications
-- **Characteristics**: Random bits, cryptographically appropriate
-- **Inputs**: Optional RNG function
+| Version | Layout                                                      | Notes                                                 |
+| ------- | ----------------------------------------------------------- | ----------------------------------------------------- |
+| v1      | 60-bit Gregorian timestamp (low bits first), clockseq, node | Node and clockseq random per process unless given     |
+| v3 / v5 | MD5 / SHA-1 of namespace bytes + UTF-8 name                 | Deterministic; `v3.DNS` etc. attached like `uuid`     |
+| v4      | 122 random bits                                             |                                                       |
+| v6      | v1 fields reordered most-significant first                  | Node and clockseq random per UUID unless given        |
+| v7      | 48-bit Unix ms timestamp, 31-bit sequence, random           | Without options, strictly increasing within a process |
 
-#### Version 5 (SHA1 Name-based)
-- **File**: `v5.ts`
-- **Use Case**: Like v3, but with stronger SHA1 hashing
-- **Characteristics**: Same input produces same UUID
-- **Inputs**: Namespace UUID + name string
+v6 is generated by building a v1 UUID and reordering its bytes (`v1ToV6`). v7 keeps module-level state: a new millisecond reseeds the sequence randomly; within the same millisecond (or if the clock goes backwards) the sequence increments, carrying into the timestamp on overflow.
 
-### 3. Hashing Algorithms
+## Hashing
 
-#### MD5 (`md5.ts`)
-- Implements RFC 1321 MD5 message digest algorithm
-- 128-bit hash output
-- Used by UUID v3
-- Functions:
-  - `md5(msg: string | number[]): string` - Returns hex digest
+`md5.ts` and `sha1.ts` take and return bytes (`Uint8Array`). Earlier versions hashed binary strings and used the hex text of the digest as UUID bytes, which produced non-standard v3/v5 UUIDs ([#52](https://github.com/eugenehp/react-native-uuid/issues/52)). Tests check both against RFC 1321 / FIPS 180 vectors and Node.js `crypto` across padding boundaries.
 
-#### SHA1 (`sha1.ts`)
-- Implements FIPS 180-1 SHA1 algorithm
-- 160-bit hash output
-- Used by UUID v5
-- More secure than MD5
-- Functions:
-  - `sha1(msg: string | number[]): string` - Returns hex digest
+## Parsing and Validation
 
-### 4. Utility Functions
+- `regex.ts`: canonical hyphenated form, version 1-8, variant `10xx`, plus the nil and max UUIDs. Case-insensitive.
+- `validate()`: regex test; also a TypeScript type guard.
+- `version()`: the version nibble; throws for invalid input.
+- `parse()`: validates, then decodes 16 bytes; throws `TypeError('Invalid UUID')` otherwise.
+- `stringify()`: formats and validates; `unparse()` formats any 16 bytes without validating.
 
-#### Regex (`regex.ts`)
-```typescript
-export const REGEX = /^(?:xxxxxxxx-?xxxx-?[1-5]xxx-?[89ab]xxx-?xxxxxxxxxxxx|00000000-?0000-?0000-?0000-?000000000000)$/i
-```
-- Validates UUID format
-- Supports both with and without hyphens
-- Case-insensitive matching
+## Random Values
 
-#### Parse (`parse.ts`)
-Converts UUID string to byte array:
-```typescript
-export function parse(uuid: string): Uint8Array
-```
-- Strips validation of input format
-- Returns 16-byte result
-- Used internally by stringify operations
+`rng()` returns 16 bytes from the first available source:
 
-#### Stringify (`stringify.ts`) / Unparse (`unparse.ts`)
-Converts byte array back to UUID string:
-```typescript
-export function stringify(arr: ArrayLike<number>): string
-```
-- Formats bytes as hyphenated UUID string
-- Ensures RFC 4122 formatting
-- `unparse.ts` is an alias for backward compatibility
+1. `globalThis.crypto.getRandomValues`, looked up on every call so polyfills loaded later are picked up.
+2. The native source registered by `index.native.ts` (React Native only). `nativeRandom.ts` calls the synchronous native method `RNUUIDRandom.getRandomBase64(256)`, decodes it, and serves 16 bytes at a time from the pool, zeroing bytes once handed out. If the call fails (e.g. synchronous calls unavailable under remote debugging) it falls through.
+3. `Math.random`, not cryptographically secure.
 
-#### Validate (`validate.ts`)
-Validates UUID format:
-```typescript
-export function validate(uuid: string): boolean
-```
-- Uses regex pattern matching
-- Supports both hyphenated and non-hyphenated formats
-- Case-insensitive
+`randomSource()` reports which one is active.
 
-#### Version (`version.ts`)
-Extracts version and variant from UUID:
-```typescript
-export function version(uuid: string): number
-export function getVariant(uuid: Uint8Array): string
-```
-
-#### Utils (`utils.ts`)
-Shared utility functions:
-- `byteToHex()` - Convert byte to hex string
-- `hexToByte()` - Convert hex string to byte
-- Byte manipulation helpers
-
-### 5. Random Number Generator (`rng.ts`)
-
-Abstracts the RNG interface, allowing custom implementations:
-
-```typescript
-export type RngFunction = () => number[];
-```
-
-The default RNG:
-- Uses `Math.random()` for general use
-- May use cryptographic APIs when available
-- Generates 16-byte arrays
-
-## Design Patterns
-
-### 1. Functional Approach
-All UUID generators are pure functions:
-- No side effects (except for v1 which maintains state for sequence numbers)
-- Deterministic (except v4)
-- Easy to test and reason about
-
-### 2. Composition
-Complex operations are built from simpler functions:
-```
-v3/v5 generators
-  ↓
-  hash (md5/sha1)
-  + namespace + name
-  ↓
-  stringify
-  + version/variant bits
-```
-
-### 3. Type Safety
-Full TypeScript implementation provides:
-- Compile-time type checking
-- Better IDE autocompletion
-- Self-documenting code
-
-### 4. Module Separation
-Each concern is isolated:
-- Algorithms in their own files
-- Utilities grouped logically
-- Clear dependencies
-
-## Data Flow
-
-### UUID v4 Generation Flow
-```
-uuid.v4()
-  ↓
-  v4.ts: v4()
-    ├─ Get RNG (default or custom)
-    ├─ Generate 16 random bytes
-    ├─ Set version bits (010 in 13-15 bits of time_hi_and_version)
-    ├─ Set variant bits (10 in 6-7 bits of clock_seq_hi_and_reserved)
-    └─ Call stringify()
-       ├─ Convert bytes to hex
-       └─ Format as: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-  ↓
-  Return: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-```
-
-### UUID v5 (Name-based) Flow
-```
-uuid.v5(name, namespace)
-  ↓
-  v5.ts: v5()
-    ├─ Parse namespace UUID to bytes
-    ├─ Combine namespace bytes + name string
-    ├─ Hash with SHA1
-    └─ Call stringify() with version=5, variant=10
-  ↓
-  Return: "886313e1-3b8a-5372-9b90-0c9aee199e5d"
-```
-
-## Performance Considerations
-
-### Algorithm Complexity
-- **v1**: O(1) - timestamp + sequence lookup
-- **v3**: O(n) - MD5 hash of name (n = name length)
-- **v4**: O(1) - random number generation
-- **v5**: O(n) - SHA1 hash of name (n = name length)
-
-### Memory Usage
-- Each UUID generation: ~200-300 bytes temporary
-- No persistent caches or buffers
-- Minimal heap impact
-
-### Optimization Strategies
-1. **Hash memoization**: For v3/v5, consider caching results for repeated namespaces
-2. **RNG pooling**: Pre-generate random bytes in batches if needed
-3. **String interning**: UUID strings are typically short strings, minimal GC impact
+The native module is a legacy-style module (`RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD` on iOS, `@ReactMethod(isBlockingSynchronousMethod = true)` on Android), which React Native's interop layer also exposes under the New Architecture. It is autolinked via the podspec and the Android `BaseReactPackage` (React Native 0.74+).
 
 ## Compatibility
 
-### JavaScript Environments
-- **Node.js**: Full support via `Math.random()`
-- **React Native**: Full support via `Math.random()`
-- **Browsers**: Full support with crypto API fallback
-- **TypeScript**: Full type definitions included
-
-### React Native Specific
-- No native modules required
-- Works in core threads and background threads
-- Compatible with Expo projects
-- No platform-specific code paths
+- **Node.js** 22+: `crypto.getRandomValues`.
+- **Browsers**: `crypto.getRandomValues`.
+- **React Native**: `crypto.getRandomValues` if polyfilled, otherwise the bundled native module. Expo Go can't load custom native modules and falls back to `Math.random` unless a polyfill is installed; Expo development builds autolink the module.
+- **TypeScript**: types for CommonJS, ESM and `moduleResolution: bundler`.
 
 ## Testing Strategy
 
-The codebase includes tests for:
-1. **Format Validation**: Ensure output matches RFC 4122
-2. **Version/Variant**: Correct bit patterns for each version
-3. **Determinism**: v1, v3, v5 produce consistent results
-4. **Randomness**: v4 produces different UUIDs with high probability
-5. **Edge Cases**: Empty strings, special characters, buffer boundaries
-6. **Cross-version**: Parse and stringify round-trip correctly
+- **Reference vectors**: v1, v3, v5, v6, v7 outputs are compared with values from the `uuid` package and Python's `uuid` module; hashes with RFC/FIPS vectors and Node.js `crypto`.
+- **Behavior**: buffer writes and bounds, option handling (including zero values), monotonicity of v6/v7, strict parsing, version/variant bits.
+- **Random sources**: `crypto`, native and `Math.random` paths are tested with mocks, including a mocked `react-native` module for the native entry.
+- **Package**: `npm run check:package` runs `publint` and `arethetypeswrong` against the packed tarball.
 
-## Future Considerations
+re RFC additions
 
-### Potential Enhancements
-1. **NIL UUID**: Support for 00000000-0000-0000-0000-000000000000
-2. **MAX UUID**: Support for ffffffff-ffff-ffff-ffff-ffffffffffff
-3. **Namespace Constants**: Pre-defined DNS, URL, OID, X.500 namespaces
-4. **Performance Profiling**: Detailed benchmarks for each version
-5. **Custom Formatting**: Support for non-hyphenated output
-
-### Deprecated Features
-- `v6` and `v7` (time-based sortable) - Future RFC additions
 - Custom clock sequence - Already supported via options
 
 ## Contributing
 
 When contributing to the architecture:
+
 1. Maintain the modular structure
 2. Keep pure functions where possible
 3. Add TypeScript types for new features

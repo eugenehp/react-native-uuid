@@ -7,7 +7,7 @@ import {
   byteToHex,
   hexToByte,
   stringToBytes,
-  bytesToString,
+  writeBytes,
 } from '../utils';
 import {validate} from '../validate';
 
@@ -96,7 +96,7 @@ describe('utils', () => {
     });
 
     it('should map "ff" to 0xff', () => {
-      expect(hexToByte['ff']).toBe(0xff);
+      expect(hexToByte.ff).toBe(0xff);
     });
 
     it('should have 256 entries', () => {
@@ -152,10 +152,13 @@ describe('utils', () => {
     });
 
     it('should handle unicode characters with UTF8 encoding', () => {
-      // "é" is UTF-8 encoded as 0xc3 0xa9
-      const result = stringToBytes('é');
-      // After UTF-8 encoding
-      expect(result.length).toBeGreaterThan(0);
+      expect(Array.from(stringToBytes('é'))).toEqual([0xc3, 0xa9]);
+      expect(Array.from(stringToBytes('日'))).toEqual([0xe6, 0x97, 0xa5]);
+      expect(Array.from(stringToBytes('😀'))).toEqual([0xf0, 0x9f, 0x98, 0x80]);
+    });
+
+    it('should throw on lone surrogates', () => {
+      expect(() => stringToBytes('\ud800')).toThrow(URIError);
     });
 
     it('should return Uint8Array', () => {
@@ -164,56 +167,31 @@ describe('utils', () => {
     });
   });
 
-  describe('bytesToString', () => {
-    it('should convert bytes to ASCII string', () => {
-      const bytes = new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f]);
-      const result = bytesToString(bytes.buffer);
-      expect(result).toBe('hello');
+  describe('writeBytes', () => {
+    const bytes = Array.from({length: 16}, (_, i) => i);
+
+    it('should write 16 bytes at an offset', () => {
+      const buf = new Uint8Array(20);
+      expect(writeBytes(bytes, buf, 2)).toBe(buf);
+      expect(Array.from(buf.slice(2, 18))).toEqual(bytes);
     });
 
-    it('should handle empty bytes', () => {
-      const bytes = new Uint8Array(0);
-      const result = bytesToString(bytes.buffer);
-      expect(result).toBe('');
+    it('should grow plain arrays', () => {
+      expect(writeBytes(bytes, [])).toEqual(bytes);
     });
 
-    it('should convert bytes to characters', () => {
-      const bytes = new Uint8Array([0x41, 0x42, 0x43]);
-      const result = bytesToString(bytes.buffer);
-      expect(result).toBe('ABC');
+    it('should throw when a typed array is too small', () => {
+      expect(() => writeBytes(bytes, new Uint8Array(16), 1)).toThrow(
+        RangeError,
+      );
     });
 
-    it('should handle special character bytes', () => {
-      const bytes = new Uint8Array([0x21, 0x40, 0x23]);
-      const result = bytesToString(bytes.buffer);
-      expect(result).toBe('!@#');
-    });
-
-    it('should work with array buffer', () => {
-      const bytes = new Uint8Array([0x74, 0x65, 0x73, 0x74]);
-      const buffer = bytes.buffer;
-      const result = bytesToString(buffer);
-      expect(result).toBe('test');
+    it('should throw for a negative offset', () => {
+      expect(() => writeBytes(bytes, [], -1)).toThrow(RangeError);
     });
   });
 
   describe('Round-trip conversions', () => {
-    it('should convert string to bytes and back', () => {
-      const original = 'Hello World';
-      const bytes = stringToBytes(original);
-      const result = bytesToString(bytes.buffer);
-      expect(result).toBe(original);
-    });
-
-    it('should handle various strings', () => {
-      const strings = ['', 'a', 'test', '12345', 'UUID'];
-      for (const str of strings) {
-        const bytes = stringToBytes(str);
-        const result = bytesToString(bytes.buffer);
-        expect(result).toBe(str);
-      }
-    });
-
     it('should convert byte to hex and back', () => {
       for (let i = 0; i < 256; i++) {
         const hex = byteToHex[i];
@@ -226,7 +204,7 @@ describe('utils', () => {
   describe('Edge cases', () => {
     it('should handle max byte value', () => {
       expect(byteToHex[255]).toBe('ff');
-      expect(hexToByte['ff']).toBe(255);
+      expect(hexToByte.ff).toBe(255);
     });
 
     it('should handle min byte value', () => {
